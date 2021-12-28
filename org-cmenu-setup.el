@@ -122,7 +122,7 @@
  '(:headline "Data")
  '(("t" "TODO" org-todo :transient t)
    ("," "Priority" org-priority :transient t)
-   ("q" "Tag" org-set-tags-command :transient t)
+   (":" "Tag" org-set-tags-command :transient t)
    ("P" "Property" org-set-property :transient t)
    ("a" "Archive Tag" org-toggle-archive-tag :transient t))
  '(headline)
