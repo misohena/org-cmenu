@@ -474,7 +474,7 @@
   :group 'org-cmenu)
 
 (defun org-cmenu-highlight-datum (datum)
-  (org-cmenu-highlight-delete)
+  (org-cmenu-unhighlight-datum)
   (setq org-cmenu-highlight-ov
         (make-overlay
          (org-element-property :begin datum)
