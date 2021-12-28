@@ -9,11 +9,13 @@ The syntax type of the current position is determined by org-element, and the me
 Set CAPTION, ATTR_HTML, comment, and uncomment for image link.
 
 #+CAPTION: Set CAPTION, ATTR_HTML, comment, and uncomment for image links.
+#+ATTR_HTML: :width 400
 [[file:./screenshot/org-cmenu-image-link.gif]]
 
 Cut and paste or move part of table.
 
 #+CAPTION: Cut and paste or move part of the table.
+#+ATTR_HTML: :width 580
 [[file:./screenshot/org-cmenu-table.gif]]
 
 * Setup
