@@ -38,7 +38,8 @@
 (org-cmenu-add-commands
  '(:hidden)
  '(("C-l" "Recenter" recenter :transient t)
-   ("C-^" "Parent" org-cmenu-select-parent))
+   ("C-^" "Parent" org-cmenu-select-parent)
+   ("C-\\" "Child" org-cmenu-select-child))
  'all
  'no-wrap)
 
