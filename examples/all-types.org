@@ -1,0 +1,357 @@
+#+TITLE: Types of All Syntax Elements in Org Mode
+* All Types
+
+- org-version :: src_elisp[:eval no-export]{(org-version)} {{{results(=9.5.1=)}}}
+- org-element-all-elements :: src_elisp[:eval no-export :results pp]{org-element-all-elements} {{{results(=(babel-call center-block clock comment comment-block diary-sexp drawer dynamic-block example-block export-block fixed-width footnote-definition headline horizontal-rule inlinetask item keyword latex-environment node-property paragraph plain-list planning property-drawer quote-block section special-block src-block table table-row verse-block)=)}}}
+- org-element-all-objects: :: src_elisp[:eval no-export :results pp]{org-element-all-objects} {{{results(=(bold citation citation-reference code entity export-snippet footnote-reference inline-babel-call inline-src-block italic line-break latex-fragment link macro radio-target statistics-cookie strike-through subscript superscript table-cell target timestamp underline verbatim)=)}}}
+
+* all-elements
+** babel-call
+
+#+call: test-fun()
+
+#+RESULTS:
+: 3
+
+** center-block
+#+begin_center
+Paragraph line1
+Paragraph line2
+#+end_center
+** clock
+*** STARTED Clock
+:LOGBOOK:
+- State "STARTED"    from              [2021-12-20 Mon 19:52]
+CLOCK: [2021-12-20 Mon 19:52]--[2021-12-20 Mon 19:53] =>  0:01
+:END:
+
+A line that starts with CLOCK:.
+
+** comment
+# comment line1
+# comment line2
+
+** comment-block
+#+begin_comment
+comment line1
+comment line2
+#+end_comment
+** diary-sexp
+%%(diary-sunrise-sunset)
+
+** drawer
+Still outside the drawer
+:DRAWERNAME:
+This is inside the drawer.
+:END:
+After the drawer.
+
+** dynamic-block
+#+BEGIN: block-update-time :format "on %m/%d/%Y at %H:%M"
+Last block update at: on 12/20/2021 at 17:40
+#+END:
+
+#+begin_src elisp :eval no-export
+(defun org-dblock-write:block-update-time (params)
+  (let ((fmt (or (plist-get params :format) "%d. %m. %Y")))
+    (insert "Last block update at: "
+            (format-time-string fmt))))
+#+end_src
+
+** example-block
+#+begin_example
+Example
+#+end_example
+
+** export-block
+#+begin_export html
+<b>test</b>
+#+end_export
+
+** fixed-width
+: Fixed Width Line1
+: Fixed Width Line2
+
+** footnote-definition
+
+See [[*footnote-reference]].
+
+[fn:test1] Foot note definition test1.
+
+[fn:test2] Foot note definition test2. This follows [fn:test1].
+
+This paragraph is included in the test2 definition.
+
+** headline
+*** SubHeadline1                                                    :EMACS:
+*** SubHeadline2
+** horizontal-rule
+
+-----
+Horizontal Rule
+-----
+
+** inlinetask
+*************** test
+*************** END
+
+(require 'org-inlinetask)
+** keyword
+
+#+OPTIONS: ^:-
+
+** latex-environment
+
+\begin{equation}
+x=\sqrt{b}
+\end{equation}
+
+** node-property
+:PROPERTIES:
+:LOCATION: This is a Node Property
+:END:
+
+** paragraph
+
+This is a paragraph 1. Line1.
+Line1.
+
+This is a paragraph 2.
+
+** plain-list
+
+#+attr_html: :class list1
+- Ringo
+- Mikan
+ #+attr_html: :class list2
+  - 
+    #+attr_html: :class paragraph1
+    Mikan A
+    Line2
+  - Mikan B [[https://google.com/]]
+  - Mikan C
+  Paragraph1
+
+  Paragraph2
+- Ichigo
+- CheckBoxes
+  -   [ ] A
+  - [ ] B
+
+
+Ordered
+
+1. item1
+2. item2
+3. item3
+
+Description
+
+- key1 :: desc1
+- key2 :: desc2
+- key3 :: desc3
+
+** item
+
+1. item1
+2. item2
+3. item3
+
+** planning
+*** DONE SCHEDULE
+CLOSED: [2021-12-20 Mon 19:18] DEADLINE: <2021-12-20 Mon> SCHEDULED: <2021-12-20 Mon>
+
+The line containing ~CLOSED:~ ~DEADLINE:~ ~SCHEDULED:~ is called planning line.
+
+** property-drawer
+:PROPERTIES:
+:LOCATION: Tokyo
+:END:
+
+** quote-block
+#+begin_quote
+Paragraph1 Line1
+Paragraph1 Line1
+Paragraph1 Line1
+
+Paragraph2 Line1
+#+end_quote
+** section
+** special-block
+
+#+begin_supesyaru
+paragraph
+#+end_supesyaru
+
+** src-block
+
+#+name: test-fun
+#+begin_src elisp :eval no-export
+(+ 1 2)
+#+end_src
+
+** table, table-row
+
+Indented table:
+  |  a |  b | c |
+  |----+----+---|
+  |  1 |  2 | 3 |
+  |  4 |  5 | 6 |
+  |  7 |  8 | 9 |
+  |----+----+---|
+  | 12 | 15 |   |
+  |  1 |  1 | 1 |
+  #+TBLFM: @5$1=vsum(@I..@II)::@5$2=vsum(@I..@II)::@6=1
+
+The smallest table that org-elements recognizes (no table-cell):
+|
+
+
+The following table has 3 rows. The 1st and 3rd rows are empty (no columns).
+
+|
+|0
+| 
+
+The follwing table has 3 empty rows.
+
+|
+|
+|
+
+A smallest table with cells:
+|0
+
+| 0
+
+A table that is not neatly aligned:
+#+NAME: tbl
+| a|b |c| d |
+|--
+|0|     1| 2   |3 |
+|    4|5|  6|  7 
+|8
+||9|10|11| 
+| 12 | 13 |
+
+| a|
+|--
+|0|     1
+|    4|5|  6|
+|8
+||9|10|11| 
+| 12 | 13 |
+
+dlines:
+
+|---+---|
+| 1 | 2 |
+| 3 | 4 |
+|---+---|
+
+hline only:
+
+|---|
+
+Column Width
+
+| <l4>        |       <c4>       |                  <r4> |          |
+| Long Column | Very Long Column | Very Very Long Column | Columnnn |
+|-------------+------------------+-----------------------+----------|
+| 1234567890  |  12345678901234  |   1234567890123456789 | Bannann  |
+| 9876543210  |  23456789012301  |   3456789012345678912 | Appllle  |
+| AAAAA       |      BBBBB       |                       | Orangee  |
+| CCCCC       |      DDDDD       |                       |          |
+|             |                  |                       |          |
+|             |                  |                       |          |
+|-------------+------------------+-----------------------+----------|
+
+** verse-block
+
+#+begin_verse
+Verse Block Line1
+Verse Block Line2
+Verse Block Line3
+#+end_verse
+
+* all-objects
+** bold, underline, italic, verbatim, code, strike-through
+
+*bold* , _underline_ , /italic/ , =verbatim= , ~code~ , +strike-through+
+
+** subscript, superscript
+
+ABCD_{subscript} , ABCD_subscript
+
+ABCD^{superscript} , ABCD^superscript
+
+** inline-babel-call, inline-src-block
+
+call_test-fun() {{{results(=3=)}}} is a inline babel call.
+
+src_elisp[:var x=2 :eval no-export]{(sqrt x)} {{{results(=1.4142135623730951=)}}} is a inline src block.
+
+** line-break
+
+first-line\\
+second-line
+
+** entity
+
+alpha=\alpha{} , beta=\beta{}
+
+** link
+
+[[*All Types][All Types(Internal Link)]]
+
+#+ATTR_HTML: :style border: solid 2px red; padding: 2px; display: inline-block
+Links in the line: [[*link][1st link]], [[*link][2nd link]], [[*link][3rd link]]. Attributes apply to the paragraph and the first link in the paragraph.
+
+Standalone Image:
+
+#+CAPTION: Fuji-san!!
+#+ATTR_HTML: :width 600
+[[file:picture1.jpg]]
+
+Inline Image:
+
+#+ATTR_HTML: :width 100 :style border:solid 2px red
+This [[file:picture1.jpg]] is the highest mountain in Japan.
+
+** footnote-reference
+
+Inline definition [fn:: This is a inline definition of this footnote] Example. Named test3 [fn:test3: This is a named test3 inline definition of this footnote] definition.
+
+Test1 [fn:test1] and Test2 [fn:test2].
+
+Test3 [fn:test3].
+
+** table-cell
+
+See [[*table, table-row]].
+
+** timestamp
+
+[2021-12-26 Sun]
+
+<2021-12-26 Sun>
+
+[2021-12-26 Sun 13:14]
+
+<2021-12-26 Sun 13:14>
+
+<2021-12-26 Sun>--<2021-12-27 Mon>
+
+** 
+
+citation
+citation-reference
+export-snippet
+
+latex-fragment
+macro
+radio-target
+statistics-cookie
+
+target
+

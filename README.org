@@ -1,0 +1,89 @@
+#+TITLE: Context Sensitive Menu for Emacs Org Mode
+
+This emacs lisp code provides a mechanism for displaying menus according to the current syntax type in Org Mode.
+
+The syntax type of the current position is determined by org-element, and the menu corresponding to the type is displayed by [[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]].
+
+* Setup
+
+#+begin_src elisp
+(autoload 'org-cmenu "org-cmenu-setup") ;; or your setup file
+(add-hook 'org-mode-hook
+          (lambda ()
+            (define-key org-mode-map (kbd "C-^") #'org-cmenu))) ;;Set to your favorite key. Such as "C-c m", "S-<f10>"...
+
+;; Add custom commands (Example)
+(with-eval-after-load "org-cmenu-setup" ;; or put following in your setup file
+
+  ;; Add two commands to a group (:basic/"Affiliated Keyword")
+  (org-cmenu-add-commands
+   ;; GROUP-PATH:
+   ;;   list of group-id
+   ;; group-id:
+   ;;   symbol : Not diplayed
+   ;;   string : Displayed
+   '(:basic "Affiliated Keyword")
+   ;; COMMANDS:
+   ;;   (key description function properties...)
+   '(("ad1" "My Data 1"
+      (lambda (datum)
+        (org-cmenu-add-affiliated-keyword "ATTR_HTML" datum)
+        (insert ":data-my-important1 Very Important Data 1!")))
+     ("ad2" "My Data 2"
+      (lambda (datum)
+        (org-cmenu-add-affiliated-keyword "ATTR_HTML" datum)
+        (insert ":data-my-important2 Very Important Data 2!"))))
+   ;; TARGET-SPEC:
+   ;;   type
+   ;;   (type properties...)
+   ;;   ((type...) properties...)
+   '(aff-elements ;; All Elements that can have affiliated keywords
+     :exclude (table)
+     :pred org-cmenu-element-or-first-link-p)
+   ;; WRAPPING-METHOD:
+   'with-datum) ;; Pass org-element datum to the COMMAND.
+
+  ;; Remove command
+  (org-cmenu-remove-command
+   'all
+   '(:basic "Affiliated Keyword") "al") ;; attr_latex
+
+  ;; Remove group
+  ;; (org-cmenu-remove-group
+  ;;  'all
+  ;;  '(:basic "Affiliated Keyword"))
+  )
+#+end_src
+
+* Datum Types
+
+org-elements.el classifies org-mode syntax elements as follows:
+
+#+begin_example elisp
+(defconst org-element-all-elements
+  '(babel-call center-block clock comment comment-block diary-sexp drawer
+               dynamic-block example-block export-block fixed-width
+               footnote-definition headline horizontal-rule inlinetask item
+               keyword latex-environment node-property paragraph plain-list
+               planning property-drawer quote-block section
+               special-block src-block table table-row verse-block)
+  "Complete list of element types.")
+
+(defconst org-element-all-objects
+  '(bold citation citation-reference code entity export-snippet
+         footnote-reference inline-babel-call inline-src-block italic line-break
+         latex-fragment link macro radio-target statistics-cookie strike-through
+         subscript superscript table-cell target timestamp underline verbatim)
+  "Complete list of object types.")
+#+end_example
+
+See examples/all-types.org for specific examples of each type.
+
+The following aliases are available in org-cmenu:
+
+- all :: org-element-all-elements and org-element-all-objects.
+- elements :: org-element-all-elements.
+- objects :: org-element-all-objects.
+- aff-elements :: Types that can have affiliated keywords.
+- com-elements :: Types that can be commented out.
+- contents :: Types with contents. See org-cmenu-contents-range function.
