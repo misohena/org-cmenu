@@ -77,7 +77,7 @@ org-elements.el classifies org-mode syntax elements as follows:
   "Complete list of object types.")
 #+end_example
 
-See examples/all-types.org for specific examples of each type.
+See [[https://raw.githubusercontent.com/misohena/org-cmenu/main/examples/all-types.org][examples/all-types.org]] for specific examples of each type.
 
 The following aliases are available in org-cmenu:
 
