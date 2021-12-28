@@ -623,6 +623,11 @@
 
 ;;;; Target Types
 
+(defun org-cmenu-after-keyword (list)
+  (while (and list (not (keywordp (car list))))
+    (setq list (cdr list)))
+  list)
+
 (defun org-cmenu-resolve-target-spec (target-spec)
   (let (target-types
         target-props)
@@ -638,7 +643,7 @@
       (setq target-types
             (seq-take-while (lambda (e) (not (keywordp e))) target-spec))
       (setq target-props
-            (seq-drop-while (lambda (e) (not (keywordp e))) target-spec))))
+            (org-cmenu-after-keyword target-spec))))
 
     ;; Resolve aliases
     (setq target-types
@@ -662,9 +667,15 @@
   (let* ((command (copy-sequence command))
          (func (org-cmenu-command-function command))
          (func-props (and (symbolp func) (get func 'org-cmenu)))
-         (target-spec (if func-props
-                          (plist-get func-props :target)
-                        target-spec))
+         (target-spec (cond
+                       ((plist-get (and (listp target-spec)
+                                        (org-cmenu-after-keyword target-spec))
+                                   :forced)
+                        target-spec)
+                       ((plist-member func-props :target)
+                        (plist-get func-props :target))
+                       (t
+                        target-spec)))
          (target (org-cmenu-resolve-target-spec target-spec))
          (target-types (car target))
          (target-props (cdr target)))
