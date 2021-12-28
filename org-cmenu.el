@@ -77,7 +77,8 @@
   (org-cmenu-define-type-alias 'aff-elements
                              (seq-difference
                               org-element-all-elements
-                              '(item table-row table-cell)
+                              '(item table-row table-cell
+                                     section headline)
                               #'eq))
   ;; Elements that can be comment (com-elements)
   (org-cmenu-define-type-alias 'com-elements

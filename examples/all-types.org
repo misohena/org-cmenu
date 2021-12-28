@@ -83,8 +83,15 @@ See [[*footnote-reference]].
 This paragraph is included in the test2 definition.
 
 ** headline
+Contents of Headline
+.
 *** SubHeadline1                                                    :EMACS:
+Contents of SubHeadline1.
+
 *** SubHeadline2
+
+Contents of SubHeadline2.
+
 ** horizontal-rule
 
 -----
