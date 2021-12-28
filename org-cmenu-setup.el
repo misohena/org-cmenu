@@ -487,10 +487,25 @@
 ;;;; Object
 ;;;;; bold, underline, italic, verbatim, code, strike-through
 ;;;;; subscript, superscript
+
+(org-cmenu-add-commands
+ '(:subscript "Subscript/Superscript")
+ '(("p" "Pretty" org-toggle-pretty-entities))
+ '(subscript superscript)
+ 'no-wrap)
+
 ;;;;; line-break
 ;;;;; citation
 ;;;;; citation-reference
 ;;;;; entity
+
+(org-cmenu-add-commands
+ '(:entity "Entity")
+ '(("p" "Pretty" org-toggle-pretty-entities)
+   ("h" "List" org-entities-help))
+ '(entity)
+ 'no-wrap)
+
 ;;;;; export-snippet
 ;;;;; footnote-reference
 ;;;;; inline-babel-call
