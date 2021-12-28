@@ -464,19 +464,28 @@
 
 ;; Highlight
 
+(defvar-local org-cmenu-highlight-ov nil)
+
+(defface org-cmenu-highlight
+  '((t :inherit highlight))
+  "Hilight syntax element."
+  :group 'org-cmenu)
+
 (defun org-cmenu-highlight-datum (datum)
-  (goto-char (org-element-property :end datum))
-  ;; :fixed-width returns too many post-blanks
-  ;; (forward-line (- (or (org-element-property :post-blank datum) 0)))
-  (cl-loop repeat (or (org-element-property :post-blank datum) 0)
-           while (looking-back "^[ \t]*\n[ \t]*"
-                               (save-excursion (forward-line -1) (point)))
-           do (forward-line -1))
-  (push-mark (point) t t) ;;@todo Avoid using mark
-  (goto-char (org-element-property :begin datum)))
+  (org-cmenu-highlight-delete)
+  (setq org-cmenu-highlight-ov
+        (make-overlay
+         (org-element-property :begin datum)
+         (- (org-element-property :end datum)
+            (or (org-element-property :post-blank datum) 0))))
+  (overlay-put org-cmenu-highlight-ov
+               'face
+               'org-cmenu-highlight))
 
 (defun org-cmenu-unhighlight-datum ()
-  (pop-mark))
+  (when org-cmenu-highlight-ov
+    (delete-overlay org-cmenu-highlight-ov)
+    (setq org-cmenu-highlight-ov nil)))
 
 ;; Open/Close
 
