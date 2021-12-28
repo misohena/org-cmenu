@@ -467,7 +467,9 @@
 (defvar-local org-cmenu-highlight-ov nil)
 
 (defface org-cmenu-highlight
-  '((t :inherit highlight))
+  '((t
+     :extend t
+     :inherit highlight))
   "Hilight syntax element."
   :group 'org-cmenu)
 
