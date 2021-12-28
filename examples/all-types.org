@@ -84,9 +84,12 @@ This paragraph is included in the test2 definition.
 
 ** headline
 Contents of Headline
-.
+
 *** SubHeadline1                                                    :EMACS:
 Contents of SubHeadline1.
+
+**** SubSub1
+Contents of SubSub1
 
 *** SubHeadline2
 

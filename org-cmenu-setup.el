@@ -68,6 +68,87 @@
 ;;;; Element
 ;;;;; section
 ;;;;; headline
+
+;; ref:
+;; - org-org-menu (in org.el)
+;; - org-keys.el
+;; - (org-speed-command-help)
+
+(org-cmenu-add-commands
+ '(:headline "Navi")
+ '(("u" "Up" outline-up-heading :transient t)
+   ("p" "Prev" outline-previous-visible-heading :transient t)
+   ("n" "Next" outline-next-visible-heading :transient t)
+   ("b" "Prev(SameLv)" outline-backward-same-level :transient t)
+   ("f" "Next(SameLv)" outline-forward-same-level :transient t)
+   ("j" "GoTo" org-goto))
+ '(headline)
+ 'no-wrap)
+
+(org-cmenu-add-commands
+ '(:headline2 "Visibility")
+ '(("TAB" "Cycle" org-cycle :transient t)
+   ("S-TAB" "Cycle" org-shifttab :transient t)
+   ("N" "Narrow/Wide" org-toggle-narrow-to-subtree :transient t))
+ '(headline)
+ 'no-wrap)
+
+(org-cmenu-add-commands
+ '(:headline "Structure")
+ '(("M-p" "Subtree Up" org-metaup :transient t)
+   ("M-n" "Subtree Down" org-metadown :transient t)
+   ("M-b" "<=Heading" org-metaleft :transient t)
+   ("M-f" "  Heading=>" org-metaright :transient t)
+   ("M-B" "<=Subtree" org-shiftmetaleft :transient t)
+   ("M-F" "  Subtree=>" org-shiftmetaright :transient t)
+   )
+ '(headline)
+ 'no-wrap)
+
+(org-cmenu-add-string
+ '(headline)
+ '(:headline :structure2)
+ " ")
+(org-cmenu-add-commands
+ '(:headline :structure2)
+ '(("l" "Clone" org-clone-subtree-with-time-shift :transient t)
+   ("s" "Sort" org-sort)
+   ("w" "Refile" org-refile)
+   ("$" "Archive" org-archive-subtree-default-with-confirmation))
+ '(headline)
+ 'no-wrap)
+
+(org-cmenu-add-commands
+ '(:headline "Data")
+ '(("t" "TODO" org-todo :transient t)
+   ("," "Priority" org-priority :transient t)
+   ("q" "Tag" org-set-tags-command :transient t)
+   ("P" "Property" org-set-property :transient t)
+   ("a" "Archive Tag" org-toggle-archive-tag :transient t))
+ '(headline)
+ 'no-wrap)
+
+(org-cmenu-add-commands
+ '(:headline "Clock")
+ '(("ci" "In" org-clock-in :transient t)
+   ("co" "Out" org-clock-out :transient t)
+   ("cc" "Cancel" org-clock-cancel :transient t)
+   ("cs" "Switch" (lambda () (interactive) (org-clock-in '(4))) :transient t))
+ '(headline)
+ 'no-wrap)
+
+(org-cmenu-add-group '(headline) '(:headline-hidden) :hide '(lambda () t))
+(org-cmenu-add-commands
+ '(:headline-hidden)
+ '(("C-u" "Up" outline-up-heading :transient t)
+   ("C-p" "Prev" outline-previous-visible-heading :transient t)
+   ("C-n" "Next" outline-next-visible-heading :transient t)
+   ("C-b" "Prev(SameLv)" outline-backward-same-level :transient t)
+   ("C-f" "Next(SameLv)" outline-forward-same-level :transient t)
+   ("<backtab>" "Cycle" org-shifttab :transient t))
+ '(headline)
+ 'no-wrap)
+
 ;;;;; babel-call
 (org-cmenu-add-commands
  '(:babel-call "Babel Call")
