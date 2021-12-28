@@ -48,7 +48,7 @@
  '(("m" "Mark" org-cmenu-mark-datum)
    ("C-w" "Kill" org-cmenu-kill-datum)
    ("M-w" "Copy" org-cmenu-copy-datum)
-   ("c" "Comment" org-cmenu-comment-element)))
+   (";" "Comment" org-cmenu-comment-element)))
 
 (org-cmenu-add-commands
  '(:basic "Contents")
