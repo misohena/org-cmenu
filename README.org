@@ -4,6 +4,14 @@ This emacs lisp code provides a mechanism for displaying menus according to the 
 
 The syntax type of the current position is determined by org-element, and the menu corresponding to the type is displayed by [[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]].
 
+* Screenshot
+
+#+CAPTION: Set CAPTION, ATTR_HTML, comment, and uncomment for image links.
+[[file:./screenshot/org-cmenu-image-link.gif]]
+
+#+CAPTION: Cut and paste or move part of the table.
+[[file:./screenshot/org-cmenu-table.gif]]
+
 * Setup
 
 #+begin_src elisp
