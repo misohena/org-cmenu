@@ -499,8 +499,12 @@
                   (org-element-type org-cmenu-pointed-datum))
         (error "The type of element currently pointing has changed"))
 
-      ;; If it is the same type, it can be continued.
-      (org-cmenu-reset-pointed-datum current-datum))
+      (unless (and (equal (org-element-property :begin current-datum)
+                          (org-element-property :begin org-cmenu-pointed-datum))
+                   (equal (org-element-property :end current-datum)
+                          (org-element-property :end org-cmenu-pointed-datum)))
+        ;; If it is the same type, it can be continued.
+        (org-cmenu-reset-pointed-datum current-datum)))
 
     (setq org-cmenu-open-p t)
     ;; Save mark and point.
