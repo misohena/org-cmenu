@@ -1,4 +1,6 @@
+
 #+TITLE: Types of All Syntax Elements in Org Mode
+
 * All Types
 
 - org-version :: src_elisp[:eval no-export]{(org-version)} {{{results(=9.5.1=)}}}
@@ -352,16 +354,51 @@ See [[*table, table-row]].
 
 <2021-12-26 Sun>--<2021-12-27 Mon>
 
-** 
+** target
 
-citation
-citation-reference
-export-snippet
+Go to [[My Target]].
 
-latex-fragment
-macro
-radio-target
-statistics-cookie
+1. 1st
+2. <<My Target>>This is my target.
 
-target
+** radio-target
 
+Go to My Radio Target.
+
+This is <<<My Radio Target>>>
+
+** macro
+
+{{{date}}}
+
+#+MACRO: poem Rose is $1, violet's $2. Life's ordered: Org assists you.
+
+{{{poem(red,blue)}}}
+
+#+MACRO: gnustamp (eval (concat "GNU/" (capitalize $1)))
+
+{{{gnustamp(linux)}}}
+
+** export-snippet
+
+brackets: @@html:&#91;&#91;@@ foo @@html:&#93;&#93;@@
+
+** latex-fragment
+
+If $a^2=b$ and \( b=2 \), then the solution must be
+either $$ a=+\sqrt{2} $$ or \[ a=-\sqrt{2} \].
+
+** statistics-cookie
+
+  - [-] call people [1/3]
+    - [ ] Peter
+    - [X] Sarah
+    - [ ] Sam
+  - [X] order food
+  - [ ] think about what music to play
+
+** citation, citation-reference
+
+[cite/l/b:see @OrgCitations pp. 7 for fun]
+
+(from: [[https://blog.tecosaur.com/tmio/2021-07-31-citations.html][July 2021 - This Month in Org]])
