@@ -606,7 +606,7 @@
 
 (org-cmenu-add-commands
  '(:basic "Insert")
- '(("i" "Insert Object" org-cmenu-insert))
+ '(("i" "Insert" org-cmenu-insert))
  '(section paragraph table-cell item
            center-block quote-block special-block dynamic-block
            drawer footnote-definition)
