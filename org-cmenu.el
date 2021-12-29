@@ -364,6 +364,62 @@
 ;;             :around
 ;;             #'org-cmenu-transient-pre-exit)
 
+;;;; org-element Extension
+
+(defun org-cmenu-element-end (datum)
+  ;;@todo The post-blank of some elements represents the number of lines.
+  ;; keyword type:
+  ;; #+TITLE: title
+  ;;   <= Even if there are many blanks here, post-blank will be 1
+  ;; next element
+  (- (org-element-property :end datum)
+     (or (org-element-property :post-blank datum) 0)))
+
+(defun org-cmenu-element-contains-point-p (datum pos)
+  (let ((begin (org-element-property :begin datum))
+        (end (org-cmenu-element-end datum)))
+  (and
+   (<= begin pos)
+   (or (< pos end)
+       ;; plain-list item
+       ;; - <here => item
+       ;; <here   => section
+       (and (= pos end)
+            (not (= (line-beginning-position) (point))))))))
+
+(defun org-cmenu-element-point-on-first-line-p (datum pos)
+  (save-excursion
+    (goto-char (or (org-element-property :post-affiliated datum)
+                   (org-element-property :begin datum)))
+    (<= (point) pos (line-end-position))))
+
+(defun org-cmenu-element-current-section ()
+  (save-excursion
+    (when (outline-previous-heading)
+      (forward-line))
+    (org-element-section-parser nil)))
+
+(defun org-cmenu-element-lineage ()
+  (let ((path (org-element-lineage (org-element-context) nil t))
+        (pos (point)))
+    (while (and path
+                (pcase (org-element-type (car path))
+                  ;; only the first line is recognized as a headline.
+                  ('headline (not (org-cmenu-element-point-on-first-line-p
+                                   (car path) pos)))
+                  ;; exclude post-blank
+                  (_ (not (org-cmenu-element-contains-point-p
+                           (car path) pos)))))
+      (setq path (cdr path)))
+    (car path)
+
+    (if (eq (org-element-type (car path)) 'headline)
+        path
+      ;; add a section element
+      (append
+       path
+       (list (org-cmenu-element-current-section))))))
+
 ;;;; Menu
 
 (defvar org-cmenu-saved-point nil)
@@ -478,8 +534,7 @@
   (setq org-cmenu-highlight-ov
         (make-overlay
          (org-element-property :begin datum)
-         (- (org-element-property :end datum)
-            (or (org-element-property :post-blank datum) 0))))
+         (org-cmenu-element-end datum)))
   (overlay-put org-cmenu-highlight-ov
                'face
                'org-cmenu-highlight))
@@ -494,17 +549,18 @@
 (defun org-cmenu-on-setup ()
   ;;(message "on-setup org-cmenu-open-p=%s" org-cmenu-open-p)
   (unless org-cmenu-open-p
-    (let ((current-datum (org-element-context)))
-      (unless (eq (org-element-type current-datum)
+    (let* ((path (org-cmenu-element-lineage))
+           (datum (car path)))
+      (unless (eq (org-element-type datum)
                   (org-element-type org-cmenu-pointed-datum))
         (error "The type of element currently pointing has changed"))
 
-      (unless (and (equal (org-element-property :begin current-datum)
+      (unless (and (equal (org-element-property :begin datum)
                           (org-element-property :begin org-cmenu-pointed-datum))
-                   (equal (org-element-property :end current-datum)
+                   (equal (org-element-property :end datum)
                           (org-element-property :end org-cmenu-pointed-datum)))
         ;; If it is the same type, it can be continued.
-        (org-cmenu-reset-pointed-datum current-datum)))
+        (org-cmenu-reset-pointed-datum path)))
 
     (setq org-cmenu-open-p t)
     ;; Save mark and point.
@@ -549,20 +605,22 @@
   "Open a menu for the syntax element pointed by the current point or DATUM."
   (interactive)
 
-  (unless datum
-    (setq datum (org-element-context)))
-  (unless datum
-    (error "No elements or objects"))
+  (let* ((path
+          (if datum
+              (org-element-lineage datum nil t)
+            (org-cmenu-element-lineage)))
+         (datum (car path)))
+    (unless datum
+      (error "No elements"))
+    (org-cmenu-reset-pointed-datum path)
 
-  (org-cmenu-reset-pointed-datum datum)
+    (org-cmenu-open-internal  datum)))
 
-  (org-cmenu-open-internal datum))
-
-(defun org-cmenu-reset-pointed-datum (datum)
+(defun org-cmenu-reset-pointed-datum (path)
   ;; Set current point information.
-  (setq org-cmenu-pointed-datum datum)
-  (setq org-cmenu-pointed-path (org-element-lineage datum nil t)) ;;@todo support sections
-  (setq org-cmenu-target-datum datum))
+  (setq org-cmenu-pointed-datum (car path))
+  (setq org-cmenu-pointed-path path)
+  (setq org-cmenu-target-datum (car path)))
 
 ;;;; Wrap Command
 
