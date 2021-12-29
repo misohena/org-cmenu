@@ -77,7 +77,7 @@
     (link . "https://orgmode.org/manual/Hyperlinks.html")
     (macro . "https://orgmode.org/manual/Macro-Replacement.html")
     (radio-target . "https://orgmode.org/manual/Radio-Targets.html")
-    (statistics-cookie . "")
+    (statistics-cookie . "https://orgmode.org/manual/Checkboxes.html")
     (strike-through . "https://orgmode.org/manual/Emphasis-and-Monospace.html")
     (subscript . "https://orgmode.org/manual/Subscripts-and-Superscripts.html")
     (superscript . "https://orgmode.org/manual/Subscripts-and-Superscripts.html")

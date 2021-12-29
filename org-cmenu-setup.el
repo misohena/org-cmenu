@@ -546,6 +546,13 @@
 ;;;;; macro
 ;;;;; radio-target
 ;;;;; statistics-cookie
+
+(org-cmenu-add-commands
+ '(:statistics-cookie "Statistics Cookie")
+ '(("u" "Update" org-update-statistics-cookies))
+ '(statistics-cookie)
+ 'no-wrap)
+
 ;;;;; target
 ;;;;; timestamp
 
