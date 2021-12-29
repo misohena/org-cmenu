@@ -48,6 +48,7 @@
  '(("m" "Mark" org-cmenu-mark-datum)
    ("C-w" "Kill" org-cmenu-kill-datum)
    ("M-w" "Copy" org-cmenu-copy-datum)
+   ("?" "Manual" org-cmenu-browse-type-document)
    (";" "Comment" org-cmenu-comment-element)))
 
 (org-cmenu-add-commands
@@ -429,7 +430,7 @@
  '(:table "Field")
  '(("." "Move" org-cmenu-table-move-cell)
    ("m" "Mark Field" org-cmenu-table-mark-field :transient t)
-   ("?" "Info" org-table-field-info :transient t)
+   ("i" "Info" org-table-field-info :transient t)
    ("=" "Set Formula" (lambda () (interactive) (org-table-eval-formula '(4))) :transient t)
    (":" "Edit Formula" (lambda () (interactive) (org-table-eval-formula '(16))) :transient t)
    ("`" "Edit Field" org-table-edit-field)
