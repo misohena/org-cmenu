@@ -5,7 +5,6 @@
 
 * Purpose
 
-1. Purpose
 This Emacs Lisp code (org-cmenu) provides a mechanism to display a key operation menu according to the current syntax element.
 
 The type of syntax element is parsed and determined by [[https://orgmode.org/worg/dev/org-element-api.html][org-element.el]], and the menu corresponding to that type is displayed by [[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]]. org-cmenu stands in the meantime and plays the following role.
@@ -169,7 +168,7 @@ Evaluating (org-cmenu-reset) clears all menu contents. Use this when you want to
 
 To add a command to the menu, you need to specify the following elements:
 
-- Target [[*Syntax Element Type][syntax element type]]
+- Target [[Syntax Element Type][syntax element type]]
 - Target group
 - Commands to add, assigned keys, description
 - How to call a command
@@ -182,12 +181,12 @@ The type (menu) to which the command is added is specified by /target-spec/.
 
 /target-spec/ is one of the following:
 
-- /type/ :: Specify one [[*Syntax Element Type][syntax element type]] (symbol)
+- /type/ :: Specify one [[Syntax Element Type][syntax element type]] (symbol)
 - (/type/ ... /:key/  /value/  /:key/  /value/ ...) :: Specify one or more [[*Syntax Element Type][syntax element types]] (symbols) and specify additional information in the rest.
 
 Examples:
 
-- 'all :: All [[*Syntax Element Type][syntax element type]]
+- 'all :: All [[Syntax Element Type][syntax element type]]
 - 'elements :: All misconduct elements
 - 'objects :: All in-line elements
 - 'paragraph :: Paragraph elements only
