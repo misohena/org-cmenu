@@ -545,7 +545,13 @@
 
 ;;;;; latex-fragment
 ;;;;; macro
+
+;;@todo search macro definition
+
 ;;;;; radio-target
+
+;;@todo search (org-occur?) target text
+
 ;;;;; statistics-cookie
 
 (org-cmenu-add-commands
@@ -555,6 +561,9 @@
  'no-wrap)
 
 ;;;;; target
+
+;;@todo search (org-occur?) target text
+
 ;;;;; timestamp
 
 ;;;; Insert
