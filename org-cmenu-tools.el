@@ -1,4 +1,4 @@
-;;; org-cmenu-tools.el --- Edit Org Element -*- lexical-binding: t; -*-
+;;; org-cmenu-tools.el --- Tools for Org Mode -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021 AKIYAMA Kouhei
 
@@ -20,9 +20,13 @@
 
 ;;; Commentary:
 
-;; 
+;; Define useful commands that are missing in org-mode.
+
+;; This file does not depend directly on org-cmenu.
 
 ;;; Code:
+
+(require 'org)
 
 ;;;; Common
 

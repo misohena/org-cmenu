@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;; 
+;; This file defines the menu contents for each element type.
 
 ;;; Code:
 

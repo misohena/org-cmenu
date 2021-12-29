@@ -20,6 +20,9 @@
 
 ;;; Commentary:
 
+;; This file is a list of correspondence between each syntax element
+;; type and the URL of the manual.
+
 ;; Usage:
 ;; (org-cmenu-browse-type-document 'timestamp)
 

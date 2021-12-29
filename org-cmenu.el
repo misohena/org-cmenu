@@ -20,7 +20,27 @@
 
 ;;; Commentary:
 
-;;
+;; This file provides a mechanism for defining and displaying menus.
+
+;; - Define Menu
+;;   - Reset
+;;     - org-cmenu-reset
+;;   - Command
+;;     - org-cmenu-add-commands
+;;     - org-cmenu-add-command
+;;     - org-cmenu-remove-command
+;;     - Command Adapter
+;;       - org-cmenu-wrap-command
+;;       - org-cmenu-target-datum
+;;   - Group
+;;     - org-cmenu-add-group
+;;     - org-cmenu-set-group-property
+;;     - org-cmenu-remove-group
+;;   - String
+;;     - org-cmenu-add-string
+;; - Display Menu
+;;   - org-cmenu
+;;   - org-cmenu-update-transient-prefixes
 
 ;;; Code:
 
