@@ -10,7 +10,7 @@ This Emacs Lisp code (org-cmenu) provides a mechanism to display a key operation
 The type of syntax element is parsed and determined by [[https://orgmode.org/worg/dev/org-element-api.html][org-element.el]], and the menu corresponding to that type is displayed by [[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]]. org-cmenu stands in the meantime and plays the following role.
 
 - Manage what menus are displayed for which [[#syntax-element-types][syntax element types]]. (org-cmenu.el)
-- The menu is actually displayed in cooperation with org-element and transient, and adjustments are made with the called command as necessary. (org-cmenu.el)
+- Display the menu in cooperation with org-element and transient, and make adjustments with the called command if necessary. (org-cmenu.el)
 - Provides commands that are missing from the org-mode standard for use from menus. (org-cmenu-tools.el)
 
 * Screenshot
@@ -21,7 +21,7 @@ Example of setting captions and HTML attributes for image links, commenting them
 #+ATTR_HTML: :width 400
 [[file:./screenshot/org-cmenu-image-link.gif]]
 
-Cut and paste or move part of table.
+Example of working with a table:
 
 #+CAPTION: Cut and paste or move part of the table.
 #+ATTR_HTML: :width 580

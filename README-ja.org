@@ -8,7 +8,7 @@
 構文要素のタイプは org-element.el によって解析・判別され、そのタイプに応じたメニューは[[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]]によって表示される。org-cmenuはその間に立ち、次の役割を担う。
 
 - どの[[#syntax-element-types][構文要素タイプ]]にどのようなメニューを表示するか管理する。(org-cmenu.el)
-- org-elementやtransientと連携して実際にメニューを表示し、必要に応じて呼び出し先のコマンドとの調整を行う。(org-cmenu.el)
+- org-elementやtransientと連携してメニューを表示し、必要に応じて呼び出し先のコマンドとの調整を行う。(org-cmenu.el)
 - メニューから使うためのorg-mode標準に欠けているコマンドを提供する。(org-cmenu-tools.el)
 
 * スクリーンショット
@@ -19,7 +19,7 @@
 #+ATTR_HTML: :width 400
 [[file:./screenshot/org-cmenu-image-link.gif]]
 
-Examples of manipulating tables:
+表をいろいろ操作する例:
 
 #+CAPTION: Cut and paste or move part of the table.
 #+ATTR_HTML: :width 580
