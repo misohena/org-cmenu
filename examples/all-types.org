@@ -398,7 +398,10 @@ either $$ a=+\sqrt{2} $$ or \[ a=-\sqrt{2} \].
   - [ ] think about what music to play
 
 ** citation, citation-reference
+(from: [[https://blog.tecosaur.com/tmio/2021-07-31-citations.html][July 2021 - This Month in Org]])
 
 [cite/l/b:see @OrgCitations pp. 7 for fun]
 
-(from: [[https://blog.tecosaur.com/tmio/2021-07-31-citations.html][July 2021 - This Month in Org]])
+#+bibliography: orgcite.bib
+
+#+print_bibliography:
