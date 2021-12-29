@@ -431,7 +431,7 @@
  '(:table "Field")
  '(("." "Move" org-cmenu-table-move-cell)
    ("m" "Mark Field" org-cmenu-table-mark-field :transient t)
-   ("i" "Info" org-table-field-info :transient t)
+   ("h" "Info" org-table-field-info :transient t)
    ("=" "Set Formula" (lambda () (interactive) (org-table-eval-formula '(4))) :transient t)
    (":" "Edit Formula" (lambda () (interactive) (org-table-eval-formula '(16))) :transient t)
    ("`" "Edit Field" org-table-edit-field)
@@ -557,9 +557,42 @@
 ;;;;; target
 ;;;;; timestamp
 
-;;;;
+;;;; Insert
 
-;;@todo Add commands to insert objects and elements in section, paragraph, etc.
+(transient-define-prefix org-cmenu-insert ()
+  "Insert"
+  [["Emphasis"
+    ("b" "Bold" org-cmenu-insert-bold)
+    ("u" "Underline" org-cmenu-insert-underline)
+    ("i" "Italic" org-cmenu-insert-italic)
+    ("v" "Verbatim" org-cmenu-insert-verbatim)
+    ("c" "Code" org-cmenu-insert-code)
+    ("+" "Strike" org-cmenu-insert-strike-through)]
+   ["Super/Subscript"
+    ("_" "Subscript" org-cmenu-insert-subscript)
+    ("^" "Superscript" org-cmenu-insert-superscript)
+    ""
+    "Babel"
+    ("C" "Inline Call" org-cmenu-insert-inline-babel-call)
+    ("s" "Inline Src" org-cmenu-insert-inline-src-block)]
+   ["Others"
+    ("RET" "Line Break" org-cmenu-insert-line-break) ;;exclude table-cell
+    ("e" "Entity" org-cmenu-insert-entity)
+    ("l" "Link" org-insert-link)
+    ("t" "Target" org-cmenu-insert-target)
+    ("r" "Radio Target" org-cmenu-insert-radio-target)
+    ("m" "Macro" org-cmenu-insert-macro)
+    ("p" "Export Snippet" org-cmenu-insert-export-snippet)]])
+
+(org-cmenu-add-commands
+ '(:basic "Insert")
+ '(("i" "Insert Object" org-cmenu-insert))
+ '(section paragraph table-cell item
+           center-block quote-block special-block dynamic-block
+           drawer footnote-definition)
+ 'no-wrap)
+
+;;@todo Add commands to insert element.
 
 ;;@todo Add commands to decorate region. bold, italic, etc.
 

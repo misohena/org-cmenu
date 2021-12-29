@@ -885,5 +885,117 @@ Return t when the line exists, nil if it does not exist."
     (org-table-expand)
     (org-table-toggle-column-width "-")))
 
+;;;; Insert
+;;;;; Insert Objects
+
+(defun org-cmenu-insert-begin-end (beg-str &optional end-str)
+  (unless end-str
+    (setq end-str beg-str))
+  (insert beg-str end-str)
+  (backward-char (length end-str)))
+
+(defun org-cmenu-insert-bold ()
+  (interactive)
+  (org-cmenu-insert-begin-end "*"))
+
+(defun org-cmenu-insert-underline ()
+  (interactive)
+  (org-cmenu-insert-begin-end "_"))
+
+(defun org-cmenu-insert-italic ()
+  (interactive)
+  (org-cmenu-insert-begin-end "/"))
+
+(defun org-cmenu-insert-verbatim ()
+  (interactive)
+  (org-cmenu-insert-begin-end "="))
+
+(defun org-cmenu-insert-code ()
+  (interactive)
+  (org-cmenu-insert-begin-end "~"))
+
+(defun org-cmenu-insert-strike-through ()
+  (interactive)
+  (org-cmenu-insert-begin-end "+"))
+
+(defun org-cmenu-insert-subscript ()
+  (interactive)
+  (org-cmenu-insert-begin-end "_{" "}"))
+
+(defun org-cmenu-insert-superscript ()
+  (interactive)
+  (org-cmenu-insert-begin-end "^{" "}"))
+
+(defun org-cmenu-insert-inline-babel-call (fname)
+  (interactive "sFunction Name: ")
+  (insert (format "call_%s()" fname)))
+
+(defun org-cmenu-insert-inline-src-block (lang)
+  (interactive "sLanguage: ")
+  (insert (format "src_%s[]{}" lang)) ;;@todo remove [] after implementing the command to add header arguments to inline-src-block. org-babel-insert-header-arg does not support insertion into inline-src-block.
+  (backward-char 1))
+
+(defun org-cmenu-insert-line-break ()
+  (interactive)
+  (insert "\\\\\n"))
+
+(defun org-cmenu-entities-name-and-utf8 (entities)
+  "Convert ENTITIES (org-entities or org-entities-user) to list
+of name and utf8."
+  (cl-loop for e in entities
+           when (listp e)
+           nconc (list (car e)
+                       (nth 6 e)))) ;;utf8
+
+(defun org-cmenu-entities-rfind (entities name-or-utf8)
+  "Find the entity by NAME-OR-UTF8 from ENTITIES (org-entities or
+org-entities-user)."
+  (seq-some
+   (lambda (e)
+     (when (listp e)
+       (cond
+        ((string= (nth 0 e) name-or-utf8) name-or-utf8) ;;name
+        ((string= (nth 6 e) name-or-utf8) (nth 0 e))))) ;;utf8
+   entities))
+
+(defun org-cmenu-insert-entity (name)
+  (interactive
+   (list
+    (let ((name-or-utf8
+           (completing-read
+            "Entity name or symbol: "
+            (nconc
+             (org-cmenu-entities-name-and-utf8 org-entities)
+             (org-cmenu-entities-name-and-utf8 org-entities-user)))))
+      (or (org-cmenu-entities-rfind org-entities name-or-utf8)
+          (org-cmenu-entities-rfind org-entities-user name-or-utf8)))))
+  (insert (format "\\%s{}" name))
+  (message "%s" (nth 6 (org-entity-get name))))
+
+;; Use org-insert-link
+;; (defun org-cmenu-insert-link ()
+;;   (interactive)
+;;   (org-cmenu-insert-begin-end "[[" "]]"))
+
+(defun org-cmenu-insert-target ()
+  (interactive)
+  (org-cmenu-insert-begin-end "<<" ">>"))
+
+(defun org-cmenu-insert-radio-target ()
+  (interactive)
+  (org-cmenu-insert-begin-end "<<<" ">>>"))
+
+(defun org-cmenu-insert-macro ()
+  (interactive)
+  ;;@todo find macro definition
+  (org-cmenu-insert-begin-end "{{{" "name(arg)}}}"))
+
+(defun org-cmenu-insert-export-snippet (backend)
+  (interactive
+   (list
+    (completing-read "Backend: "
+                     (mapcar #'symbol-name org-export-backends))))
+  (org-cmenu-insert-begin-end (format "@@%s:" backend) "@@"))
+
 (provide 'org-cmenu-tools)
 ;;; org-cmenu-tools.el ends here
