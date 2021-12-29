@@ -585,13 +585,14 @@
     ("C" "Inline Call" org-cmenu-insert-inline-babel-call)
     ("s" "Inline Src" org-cmenu-insert-inline-src-block)]
    ["Others"
-    ("RET" "Line Break" org-cmenu-insert-line-break) ;;exclude table-cell
     ("e" "Entity" org-cmenu-insert-entity)
     ("l" "Link" org-insert-link)
     ("t" "Target" org-cmenu-insert-target)
     ("r" "Radio Target" org-cmenu-insert-radio-target)
     ("m" "Macro" org-cmenu-insert-macro)
-    ("p" "Export Snippet" org-cmenu-insert-export-snippet)]])
+    ("@" "Export Snippet" org-cmenu-insert-export-snippet)
+    ("RET" "Line Break" org-cmenu-insert-line-break) ;;exclude table-cell
+    ]])
 
 (org-cmenu-add-commands
  '(:basic "Insert")
