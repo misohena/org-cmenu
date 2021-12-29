@@ -9,7 +9,7 @@ This Emacs Lisp code (org-cmenu) provides a mechanism to display a key operation
 
 The type of syntax element is parsed and determined by [[https://orgmode.org/worg/dev/org-element-api.html][org-element.el]], and the menu corresponding to that type is displayed by [[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]]. org-cmenu stands in the meantime and plays the following role.
 
-- Manage what menus are displayed for which syntax element types. (org-cmenu.el)
+- Manage what menus are displayed for which [[#syntax-element-types][syntax element types]]. (org-cmenu.el)
 - The menu is actually displayed in cooperation with org-element and transient, and adjustments are made with the called command as necessary. (org-cmenu.el)
 - Provides commands that are missing from the org-mode standard for use from menus. (org-cmenu-tools.el)
 
@@ -168,7 +168,7 @@ Evaluating (org-cmenu-reset) clears all menu contents. Use this when you want to
 
 To add a command to the menu, you need to specify the following elements:
 
-- Target [[Syntax Element Type][syntax element type]]
+- Target [[#syntax-element-types][syntax element type]]
 - Target group
 - Commands to add, assigned keys, description
 - How to call a command
@@ -181,12 +181,12 @@ The type (menu) to which the command is added is specified by /target-spec/.
 
 /target-spec/ is one of the following:
 
-- /type/ :: Specify one [[Syntax Element Type][syntax element type]] (symbol)
-- (/type/ ... /:key/  /value/  /:key/  /value/ ...) :: Specify one or more [[*Syntax Element Type][syntax element types]] (symbols) and specify additional information in the rest.
+- /type/ :: Specify one [[#syntax-element-types][syntax element type]] (symbol)
+- (/type/ ... /:key/  /value/  /:key/  /value/ ...) :: Specify one or more [[#syntax-element-types][syntax element types]] (symbols) and specify additional information in the rest.
 
 Examples:
 
-- 'all :: All [[Syntax Element Type][syntax element type]]
+- 'all :: All [[#syntax-element-types][syntax element type]]
 - 'elements :: All misconduct elements
 - 'objects :: All in-line elements
 - 'paragraph :: Paragraph elements only
@@ -273,7 +273,10 @@ The command to move the contents of table-cell down (org-table-move-cell-down, w
  'no-wrap)
 #+end_src
 
-* Syntax Element Type
+* Syntax Element Types
+:PROPERTIES:
+:CUSTOM_ID: syntax-element-types
+:END:
 
 org-element.el classifies the syntax elements of org-mode as follows:
 

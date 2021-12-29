@@ -7,7 +7,7 @@
 
 構文要素のタイプは org-element.el によって解析・判別され、そのタイプに応じたメニューは[[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]]によって表示される。org-cmenuはその間に立ち、次の役割を担う。
 
-- どの[[*構文要素タイプ][構文要素タイプ]]にどのようなメニューを表示するか管理する。(org-cmenu.el)
+- どの[[#syntax-element-types][構文要素タイプ]]にどのようなメニューを表示するか管理する。(org-cmenu.el)
 - org-elementやtransientと連携して実際にメニューを表示し、必要に応じて呼び出し先のコマンドとの調整を行う。(org-cmenu.el)
 - メニューから使うためのorg-mode標準に欠けているコマンドを提供する。(org-cmenu-tools.el)
 
@@ -165,12 +165,12 @@ Examples of manipulating tables:
 
 メニューにコマンドを追加するには、次の要素を指定する必要がある。
 
-- 追加先の[[*構文要素タイプ][構文要素タイプ]]
+- 追加先の[[#syntax-element-types][構文要素タイプ]]
 - 追加先のグループ
 - 追加するコマンド、割り当てキー、表示タイトル
 - コマンドの呼び出し方
 
-*** 追加先の[[*構文要素タイプ][構文要素タイプ]]を指定する
+*** 追加先の[[#syntax-element-types][構文要素タイプ]]を指定する
 
 org-cmenuは構文要素のタイプ毎にメニューの定義を作成する。例えばlink用のメニュー、paragraph用のメニュー、table-cell用のメニュー、等々。
 
@@ -178,12 +178,12 @@ org-cmenuは構文要素のタイプ毎にメニューの定義を作成する�
 
 /target-spec/ はつぎのいずれかである。
 
-- /type/ : 一つの[[*構文要素タイプ][構文要素タイプ]](symbol)を指定する
-- ( /type/...  /:key/  /value/  /:key/  /value/ ....) : 一つ以上の[[*構文要素タイプ][構文要素タイプ]](symbol)を指定し、残りで追加の情報を指定する。
+- /type/ : 一つの[[#syntax-element-types][構文要素タイプ]](symbol)を指定する
+- ( /type/...  /:key/  /value/  /:key/  /value/ ....) : 一つ以上の[[#syntax-element-types][構文要素タイプ]](symbol)を指定し、残りで追加の情報を指定する。
 
 具体的な例:
 
-- 'all :: 全ての[[*構文要素タイプ][構文要素タイプ]]
+- 'all :: 全ての[[#syntax-element-types][構文要素タイプ]]
 - 'elements :: 全ての非行内要素
 - 'objects :: 全ての行内要素
 - 'paragraph :: 段落要素のみ
@@ -271,6 +271,9 @@ table-cellの内容を下に移動するコマンド(org-table-move-cell-down。
 #+end_src
 
 * 構文要素タイプ
+:PROPERTIES:
+:CUSTOM_ID: syntax-element-types
+:END:
 
 org-element.el は org-mode の構文要素を次のように分類している。
 
