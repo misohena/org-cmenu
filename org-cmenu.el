@@ -36,7 +36,12 @@
   :prefix "org-cmenu-"
   :group 'org)
 
-(defvar org-cmenu-update-transient-prefix-everytime t)
+(defcustom org-cmenu-update-transient-prefix-everytime t
+  "If non-nil, redefine the transient prefix each time the menu is displayed.
+
+If nil you should use `org-cmenu-update-transient-prefixes' function."
+  :type 'boolean
+  :group 'org-cmenu)
 
 ;;;; Reset
 
