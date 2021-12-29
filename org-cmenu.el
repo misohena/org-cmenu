@@ -411,7 +411,6 @@
                   (_ (not (org-cmenu-element-contains-point-p
                            (car path) pos)))))
       (setq path (cdr path)))
-    (car path)
 
     (if (eq (org-element-type (car path)) 'headline)
         path

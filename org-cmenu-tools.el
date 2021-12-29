@@ -861,11 +861,11 @@ Return t when the line exists, nil if it does not exist."
 (defun org-cmenu-table-cycle-column-width ()
   (interactive)
   ;;(message "last=%s this=%s" last-command this-command)
-  (setq org-cmenu-table-cycle-column-width
+  (setq org-cmenu-table-cycle-column-width--count
         (if (eq last-command this-command)
-            (1+ org-cmenu-table-cycle-column-width)
+            (1+ org-cmenu-table-cycle-column-width--count)
           0))
-  (pcase (% org-cmenu-table-cycle-column-width 4)
+  (pcase (% org-cmenu-table-cycle-column-width--count 4)
     (0 (if (org-cmenu-table-has-column-width-spec-p)
            (org-table-shrink)
          (org-cmenu-table-shrink-all-column)))
