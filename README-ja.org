@@ -1,0 +1,306 @@
+#+TITLE: Emacs org-mode のためのコンテキストメニュー
+#+SUBTITLE: 現在の構文要素に応じた操作メニューを表示する
+
+* 目的
+
+このEmacs Lispコード(org-cmenu)は、現在のポイントが指しているorg-modeの構文要素に応じたキー操作メニューを表示する仕組みを提供する。
+
+構文要素のタイプは org-element.el によって解析・判別され、そのタイプに応じたメニューは[[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]]によって表示される。org-cmenuはその間に立ち、次の役割を担う。
+
+- どの[[*構文要素タイプ][構文要素タイプ]]にどのようなメニューを表示するか管理する。(org-cmenu.el)
+- org-elementやtransientと連携して実際にメニューを表示し、必要に応じて呼び出し先のコマンドとの調整を行う。(org-cmenu.el)
+- メニューから使うためのorg-mode標準に欠けているコマンドを提供する。(org-cmenu-tools.el)
+
+* スクリーンショット
+
+画像リンクに対して、キャプションとHTML属性を設定し、コメントアウトし、再びコメント化解除をする例:
+
+#+CAPTION: Set CAPTION, ATTR_HTML, comment, and uncomment for image links.
+#+ATTR_HTML: :width 400
+[[file:./screenshot/org-cmenu-image-link.gif]]
+
+Examples of manipulating tables:
+
+#+CAPTION: Cut and paste or move part of the table.
+#+ATTR_HTML: :width 580
+[[file:./screenshot/org-cmenu-table.gif]]
+
+* デフォルトのメニューで実装している機能
+
+現在の所、デフォルトのメニュー(org-cmenu-setup.elで定義)で実装している機能は次の通り。
+
+- 要素に対する
+  - 範囲選択
+  - カット
+  - コピー
+  - org-modeマニュアルを開く
+  - コメント化/コメント解除
+- 要素の内容に対する
+  - 範囲選択
+  - カット
+  - コピー
+  - 中身をむき出しにする(囲っている部分を削除)
+- Affiliated Keywords (#+ATTR_HTMLや#+CAPTION、#+NAME等、要素の前にくっつくキーワード)
+  - 属性の追加(#+ATTR_ORG, ATTR_HTML, ATTR_LATEX)
+  - 名前の追加(#+NAME)
+  - 表題の追加(#+CAPTION)
+- 見出しに対するorg-speed-command的な操作
+  - カーソル移動
+  - 可視性制御
+  - サブツリー移動
+  - サブツリークローン
+  - ソート
+  - アーカイブ
+  - TODO、優先度、タグ、プロパティ変更
+  - クロック操作
+- ソースブロック関連(#+CALL、#+BEGIN_SRC、call_、src_)に対する
+  - 実行
+  - 結果の削除
+  - その他 Babel speed keys(C-c C-v prefix) メニュー
+- リスト全体やリスト項目に対する
+  - S式コピー
+  - 見出し化
+  - 整形
+  - チェックボックスON/OFF
+  - チェックボックス作成/削除
+- プロパティドロワーに対する
+  - プロパティの設定
+- 表に対する
+  - セル単位の上下左右移動
+  - 矩形リージョンに対するカット、コピーとそのペースト
+  - セル、行、列の移動
+  - セル、行、列の範囲選択(マーク)
+  - 転置
+  - TAB、S-TABによる幅の縮小と展開
+  - 整形
+  - S式コピー
+  - 行、列の追加、削除
+  - 水平線の追加
+  - 式の編集等
+  - 行、列、表全体の総和計算
+- 下付き・上付き文字に対する
+  - インライン表示のON/OFF
+- 文字エンティティに対する
+  - インライン表示のON/OFF
+  - リスト表示
+- リンクに対する
+  - パスと説明の編集
+  - 開く(デフォルト、システム優先、Emacs優先)
+  - パスのコピー
+  - ファイル情報の表示
+- Statistics Cookie ([1/3]みたいなやつ)
+  - 更新
+- 段落、テーブルセル、リストアイテム、各種ブロック等に対する各種追加
+  - 太字、下線、イタリック、逐語、コード、取消線
+  - 上付き、下付き文字
+  - インラインCALL、インラインSRC
+  - 文字エンティティの追加(候補選択、逆引き可能)
+  - リンク
+  - ターゲット(<< >>)
+  - ラジオターゲット(<<< >>>)
+  - マクロ
+  - エクスポートスニペット
+  - 強制改行
+
+* 設定例
+
+#+begin_src elisp
+(autoload 'org-cmenu "org-cmenu")
+(add-hook 'org-mode-hook
+          (lambda ()
+            ;; メニューを開くキーを設定する
+            (define-key org-mode-map (kbd "C-^") #'org-cmenu))) ;;キー設定はお好みで。例えば "C-c m" (Menuのm)とか "S-<f10>" (Windowsのコンテキストメニューのキー)とか
+
+(with-eval-after-load "org-cmenu"
+  ;; メニューの内容を定義する
+  (require 'org-cmenu-setup) ;; or your setup file
+
+  ;; ---------------------------------
+  ;; 【カスタムコマンドを追加する例】
+
+  ;; HTMLのdata属性を追加する二つのコマンドを追加する例
+  (org-cmenu-add-commands
+   '(:basic "Affiliated Keyword")
+   '(("ad1" "My Data 1"
+      (lambda (datum)
+        (org-cmenu-add-affiliated-keyword "ATTR_HTML" datum)
+        (insert ":data-my-important1 Very Important Data 1!")))
+     ("ad2" "My Data 2"
+      (lambda (datum)
+        (org-cmenu-add-affiliated-keyword "ATTR_HTML" datum)
+        (insert ":data-my-important2 Very Important Data 2!"))))
+   '(aff-elements ;; affiliated keywordを持つことが出来る要素が対象
+     :exclude (table) ;;ただしtableは除く
+     :pred org-cmenu-element-or-first-link-p) ;;elementか段落内の最初のリンクのみ有効
+   'with-datum) ;; 構文要素情報を第一引数に渡す
+
+  ;; コマンドを削除する例
+  (org-cmenu-remove-command
+   'all
+   '(:basic "Affiliated Keyword") "al") ;; attr_latex
+
+  ;; グループを削除する例
+  ;; (org-cmenu-remove-group
+  ;;  'all
+  ;;  '(:basic "Affiliated Keyword"))
+  )
+#+end_src
+
+* カスタマイズ
+
+メニューの内容は org-cmenu-setup.el によって定義されている。このファイルがメニューを定義した後に項目を追加・削除してカスタマイズできる。
+
+また、メニューの内容が大幅に変わる場合は org-cmenu-setup.el をコピーして自分専用のsetupファイルを作成することもできる。その際は、setupファイルの中で次のことを行うと良い。
+
+- (require 'org-cmenu)
+- (org-cmenu-reset) ;;必要に応じて
+- org-cmenu-add-groupを呼び出してグループを追加する (必須では無い。グループに特別なプロパティを設定する必要がある場合のみ明示的に呼び出す)
+- org-cmenu-add-commandsを呼び出して構文タイプとグループの組み合わせに対してコマンドを追加する
+
+** 設定のリセット
+
+(org-cmenu-reset) を評価するとメニューの内容が全てクリアされる。メニューの内容を確実に保証したい場合や、最初から設定をやり直したくなったときに使用すると良い。
+
+** コマンド(関数)の追加方法
+
+メニューにコマンドを追加するには、次の要素を指定する必要がある。
+
+- 追加先の[[*構文要素タイプ][構文要素タイプ]]
+- 追加先のグループ
+- 追加するコマンド、割り当てキー、表示タイトル
+- コマンドの呼び出し方
+
+*** 追加先の[[*構文要素タイプ][構文要素タイプ]]を指定する
+
+org-cmenuは構文要素のタイプ毎にメニューの定義を作成する。例えばlink用のメニュー、paragraph用のメニュー、table-cell用のメニュー、等々。
+
+コマンドを追加するタイプ(メニュー)は /target-spec/ で指定する。
+
+/target-spec/ はつぎのいずれかである。
+
+- /type/ : 一つの[[*構文要素タイプ][構文要素タイプ]](symbol)を指定する
+- ( /type/...  /:key/  /value/  /:key/  /value/ ....) : 一つ以上の[[*構文要素タイプ][構文要素タイプ]](symbol)を指定し、残りで追加の情報を指定する。
+
+具体的な例:
+
+- 'all :: 全ての[[*構文要素タイプ][構文要素タイプ]]
+- 'elements :: 全ての非行内要素
+- 'objects :: 全ての行内要素
+- 'paragraph :: 段落要素のみ
+- '(paragraph table-cell) :: 段落とテーブルセル
+- '(all :exclude (table table-row table-cell)) :: テーブル類を除いた全て
+
+*** 追加先のグループを指定する
+
+メニューの内容はグループの入れ子(ツリー)によって表現されている。このグループはtransientのグループに対応している。
+
+第一レベルのグループは上から下へ配置される。第二レベルのグループは左から右へ配置される(transientによって)。
+
+グループは識別子を持っている。識別子はequal関数で比較できればどんな型の値でも良い。ただし、文字列の場合はグループのタイトルとして表示に使用される。その他、シンボルなどの場合は識別のみに使用され表示には使用されない。
+
+グループは階層を持っているので、どのグループへ追加するかは group-path (グループ識別子のリスト)で指定する必要がある。
+
+具体的な例:
+- '("Common")
+- '("Table" "Navigation")
+- '(:table "Table Navi") ;; :table は文字列ではないので識別には使われるがタイトルには使われない
+
+コマンドを追加する際、存在しないグループはその都度作成され末尾に追加される。
+
+*** コマンドの呼び出し規約
+
+コマンドを追加するにあたって、そのコマンドをどのように呼び出すのかを指定する必要がある。
+
+- 'no-wrap :: そのまま呼び出す。
+- 'with-datum :: 現在選択中の構文要素を第一引数にして呼び出す。
+- 'at-begin :: ポイントを現在選択中の構文要素の先頭に移動して呼び出す。
+- 'at-post-affiliated :: ポイントを現在選択中の構文要素のaffiliated keywordの直後に移動して呼び出す。
+
+例えば次のような状況を考える。
+
+#+begin_src org
+1. Item1
+2. Item2
+3. Item3
+   - Item3-1 *現在のポイントここ*
+   - Item3-2
+#+end_src
+
+現在のポイントは、plain-list(ordered)の中のitemの中のplain-list(unordered)の中のitemの中のparagraphの中のboldの中にある。
+
+ユーザーは、現在のポイントを包む全ての親要素(plain-list, item, plain-list, item, paragraph, body)へメニューを切り替えることができる。従ってコマンドは現在どの要素が選択されているのか知らなければ正しい処理を行えない場合がある。
+
+例えば構文要素全体をカットするコマンドは、現在選択されているの要素がboldなら*から*までをカットすれば良い。しかしplain-listが選択されているならそのコマンドは「- Item3-1」と「- Item3-2」の二行をカットしなければならない。そういった場合には、'with-datumを指定して第一引数に構文要素の情報を引き渡して貰うか、または、 ~(org-cmenu-target-datum)~ 関数を使用して取得する必要がある。
+
+#+begin_src elisp
+(defun my-cut-element (datum)
+  (kill-region
+   (org-element-property :begin datum)
+   (org-element-property :end datum)))
+
+(defun my-copy-element (datum)
+  (kill-ring-save
+   (org-element-property :begin datum)
+   (org-element-property :end datum)))
+
+(org-cmenu-add-commands
+ '("Common")
+ '(("x" "Cut Element" my-cut-element)
+   ("c" "Copy Element" my-copy-element))
+ 'all
+ 'with-datum)
+#+end_src
+
+逆に対象となる構文要素の情報が不要な場合もある。例えば次のような状況を考える。
+
+#+begin_src org
+| abcdef | *現在のポイントここ* |
+| ABCDEF |               123456 |
+#+end_src
+
+現在のポイントが指す構文要素は、bold、table-cell、table-row、tableとなる。
+
+table-cellの内容を下に移動するコマンド(org-table-move-cell-down。org-modeに標準で入っている)は、現在のポイントがtable-cell上にありさえすれば良い。表は入れ子に出来ないのでどのtable-cellか曖昧になる事は無い。そのような場合は対象タイプを 'table-cell にして 'no-wrap を指定すればそのままそのコマンドを使うことができる。引数が無くても現在の位置から間違いなく対象のセルが特定できる。
+
+#+begin_src elisp
+(org-cmenu-add-commands
+ '("Table Cell")
+ '(("D" "Move Down" org-table-move-cell-down))
+ 'table-cell
+ 'no-wrap)
+#+end_src
+
+* 構文要素タイプ
+
+org-element.el は org-mode の構文要素を次のように分類している。
+
+#+begin_example elisp
+(defconst org-element-all-elements
+  '(babel-call center-block clock comment comment-block diary-sexp drawer
+               dynamic-block example-block export-block fixed-width
+               footnote-definition headline horizontal-rule inlinetask item
+               keyword latex-environment node-property paragraph plain-list
+               planning property-drawer quote-block section
+               special-block src-block table table-row verse-block)
+  "Complete list of element types.")
+
+(defconst org-element-all-objects
+  '(bold citation citation-reference code entity export-snippet
+         footnote-reference inline-babel-call inline-src-block italic line-break
+         latex-fragment link macro radio-target statistics-cookie strike-through
+         subscript superscript table-cell target timestamp underline verbatim)
+  "Complete list of object types.")
+#+end_example
+
+org-element.el 内では、objectが行内要素、elementが非行内要素を指しており、その両方を含むあらゆる要素はdatumと呼ばれていることが多い。
+
+各要素タイプの具体的な例は [[https://raw.githubusercontent.com/misohena/org-cmenu/main/examples/all-types.org][examples/all-types.org]] を参照のこと。[[https://github.com/misohena/org-cmenu/blob/main/org-cmenu-typedoc.el][org-cmenu-typedoc.el]]にはタイプ名とorg-modeマニュアルへのURLの対応リストが書いてある。org-cmenuのメニューから "?" を押すと選択中の構文要素の説明がブラウザで開くので参考にして欲しい。
+
+org-cmenuではこれらのタイプ名シンボルが使用できるほか、次の別名も使用できる。
+
+- all :: org-element-all-elements と org-element-all-objects の各タイプ
+- elements :: org-element-all-elements の各タイプ
+- objects :: org-element-all-objects の各タイプ
+- aff-elements :: Affiliated Keywordsを持てるelement
+- com-elements :: コメントアウトできるelement
+- contents :: 内容を持つことができる全タイプ(org-cmenu-contents-range 関数を参照)

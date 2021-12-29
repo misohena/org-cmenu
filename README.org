@@ -1,12 +1,22 @@
 #+TITLE: Context Sensitive Menu for Emacs Org Mode
+#+SUBTITLE: Display the operation menu according to the current syntax element
 
-This emacs lisp code provides a mechanism for displaying menus according to the current syntax type in Org Mode.
+(This document has been translated by Google Translate. The original document is [[file:README-ja.org][here]])
 
-The syntax type of the current position is determined by org-element, and the menu corresponding to the type is displayed by [[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]].
+* Purpose
+
+1. Purpose
+This Emacs Lisp code (org-cmenu) provides a mechanism to display a key operation menu according to the current syntax element.
+
+The type of syntax element is parsed and determined by [[https://orgmode.org/worg/dev/org-element-api.html][org-element.el]], and the menu corresponding to that type is displayed by [[https://github.com/magit/transient/blob/master/lisp/transient.el][transient.el]]. org-cmenu stands in the meantime and plays the following role.
+
+- Manage what menus are displayed for which syntax element types. (org-cmenu.el)
+- The menu is actually displayed in cooperation with org-element and transient, and adjustments are made with the called command as necessary. (org-cmenu.el)
+- Provides commands that are missing from the org-mode standard for use from menus. (org-cmenu-tools.el)
 
 * Screenshot
 
-Set CAPTION, ATTR_HTML, comment, and uncomment for image link.
+Example of setting captions and HTML attributes for image links, commenting them out, and uncommenting them again:
 
 #+CAPTION: Set CAPTION, ATTR_HTML, comment, and uncomment for image links.
 #+ATTR_HTML: :width 400
@@ -18,27 +28,103 @@ Cut and paste or move part of table.
 #+ATTR_HTML: :width 580
 [[file:./screenshot/org-cmenu-table.gif]]
 
+* Features implemented in the default menu
+
+Currently, the functions implemented in the default menu (defined in org-cmenu-setup.el) are as follows.
+
+- For elements
+  - Range selection
+  - Cut
+  - Copy
+  - Open the org-mode manual
+  - Comment / Uncomment
+- For contents of the element
+  - Range selection
+  - Cut
+  - Copy
+  - Exposing the contents (remove the enclosed part)
+- Affiliated Keywords (#+ATTR_HTML, #+CAPTION, #+NAME, etc.)
+  - Add attributes (#+ATTR_ORG, ATTR_HTML, ATTR_LATEX)
+  - Add name (#+NAME)
+  - Add caption (#+CAPTION)
+- org-speed-command-like operation for headings
+  - Move cursor
+  - Visibility control
+  - Move subtree
+  - Subtree clone
+  - Sort
+  - Archive
+  - TODO, priority, tag, property change
+  - Clock operation
+- For source block related (#+CALL, #+BEGIN_SRC, call_, src_)
+  - execution
+  - Delete result
+  - Other Babel speed keys (C-c C-v prefix) menu
+- For the entire list or list items
+  - S-expression copy
+  - Heading
+  - Shaping
+  - Checkbox ON / OFF
+  - Create / delete checkbox
+- For property drawers
+  - Property settings
+- For the table
+  - Move up / down / left / right in cell units
+  - Cut, copy and paste to rectangular region
+  - Move cells, rows and columns
+  - Select cell, row, and column range (mark)
+  - Transpose
+  - Width reduction and expansion by TAB and S-TAB
+  - Shaping
+  - S-expression copy
+  - Add / Remove Rows and Columns
+  - Addition of horizontal line
+  - Editing expressions, etc.
+  - Sum total of rows, columns and tables
+- For subscripts and superscripts
+  - ON / OFF of inline display
+- For character entities
+  - ON / OFF of inline display
+  - List display
+- For links
+  - Edit path and description
+  - Open (default, system priority, Emacs priority)
+  - Copy of path
+  - Display file information
+-Statistics Cookie (like [1/3])
+  - Update
+- Various additions to paragraphs, table cells, list items, various blocks, etc.
+  - Bold, underlined, italic, verbatim, code, strikethrough
+  - Superscript, subscript
+  - Inline CALL, Inline SRC
+  - Add character entity (candidate selection, reverse lookup possible)
+  - Link
+  - Target (<< >>)
+  - Radio target (<<< >>>)
+  - Macro
+  - Export snippet
+  - Forced line breaks
+
 * Setup
 
 #+begin_src elisp
-(autoload 'org-cmenu "org-cmenu-setup") ;; or your setup file
+(autoload 'org-cmenu "org-cmenu")
 (add-hook 'org-mode-hook
           (lambda ()
-            (define-key org-mode-map (kbd "C-^") #'org-cmenu))) ;;Set to your favorite key. Such as "C-c m", "S-<f10>"...
+            ;; Set the key to open the menu
+            ;; Assign your favorite key. For example, "C-c m" (Menu m) or "S-<f10>" (Windows context menu key)
+            (define-key org-mode-map (kbd "C-^") #'org-cmenu)))
 
-;; Add custom commands (Example)
-(with-eval-after-load "org-cmenu-setup" ;; or put following in your setup file
+(with-eval-after-load "org-cmenu"
+  ;; Define the contents of the menu
+  (require 'org-cmenu-setup) ;; or your setup file
 
-  ;; Add two commands to a group (:basic/"Affiliated Keyword")
+  ;; ---------------------------------
+  ;; [Example of adding a custom command]
+
+  ;; Example of adding two commands to add HTML data attribute
   (org-cmenu-add-commands
-   ;; GROUP-PATH:
-   ;;   list of group-id
-   ;; group-id:
-   ;;   symbol : Not diplayed
-   ;;   string : Displayed
    '(:basic "Affiliated Keyword")
-   ;; COMMANDS:
-   ;;   (key description function properties...)
    '(("ad1" "My Data 1"
       (lambda (datum)
         (org-cmenu-add-affiliated-keyword "ATTR_HTML" datum)
@@ -47,31 +133,150 @@ Cut and paste or move part of table.
       (lambda (datum)
         (org-cmenu-add-affiliated-keyword "ATTR_HTML" datum)
         (insert ":data-my-important2 Very Important Data 2!"))))
-   ;; TARGET-SPEC:
-   ;;   type
-   ;;   (type properties...)
-   ;;   ((type...) properties...)
-   '(aff-elements ;; All Elements that can have affiliated keywords
-     :exclude (table)
-     :pred org-cmenu-element-or-first-link-p)
-   ;; WRAPPING-METHOD:
-   'with-datum) ;; Pass org-element datum to the COMMAND.
+   '(aff-elements ;; Targets elements that can have affiliated keywords
+     :exclude (table) ;;However, table is excluded
+     :pred org-cmenu-element-or-first-link-p) ;;Only valid for element or the first link in a paragraph
+   'with-datum) ;; Pass syntax element information as the first argument
 
-  ;; Remove command
+  ;; Example of deleting a command
   (org-cmenu-remove-command
    'all
    '(:basic "Affiliated Keyword") "al") ;; attr_latex
 
-  ;; Remove group
+  ;; Example of deleting a group
   ;; (org-cmenu-remove-group
   ;;  'all
   ;;  '(:basic "Affiliated Keyword"))
   )
 #+end_src
 
-* Datum Types
+* Customize
 
-org-elements.el classifies org-mode syntax elements as follows:
+The contents of the menu are defined by org-cmenu-setup.el. Items can be added / removed and customized after this file defines the menu.
+
+You can also copy org-cmenu-setup.el to create your own setup file if the menu content changes significantly. In that case, you should do the following in the setup file.
+
+- (require 'org-cmenu)
+- (org-cmenu-reset) ;; as needed
+- Call org-cmenu-add-group to add a group (not required, explicitly only if you need to set special properties for the group)
+- Call org-cmenu-add-commands to add commands for syntax type and group combinations
+
+** Reset Settings
+
+Evaluating (org-cmenu-reset) clears all menu contents. Use this when you want to guarantee the contents of the menu or when you want to start over from the beginning.
+
+** How to Add Commands
+
+To add a command to the menu, you need to specify the following elements:
+
+- Target [[*Syntax Element Type][syntax element type]]
+- Target group
+- Commands to add, assigned keys, description
+- How to call a command
+
+*** Specify the target syntax element type
+
+org-cmenu creates a menu definition for each type of syntax element. For example, a menu for link, a menu for paragraph, a menu for table-cell, and so on.
+
+The type (menu) to which the command is added is specified by /target-spec/.
+
+/target-spec/ is one of the following:
+
+- /type/ :: Specify one [[*Syntax Element Type][syntax element type]] (symbol)
+- (/type/ ... /:key/  /value/  /:key/  /value/ ...) :: Specify one or more [[*Syntax Element Type][syntax element types]] (symbols) and specify additional information in the rest.
+
+Examples:
+
+- 'all :: All [[*Syntax Element Type][syntax element type]]
+- 'elements :: All misconduct elements
+- 'objects :: All in-line elements
+- 'paragraph :: Paragraph elements only
+- '(paragraph table-cell) :: paragraphs and table cells
+- '(all: exclude (table table-row table-cell)) :: All except tables
+
+*** Specify the group to add to
+
+The contents of the menu are represented by group nesting (trees). This group corresponds to the transient group.
+
+First level groups are arranged from top to bottom. Second level groups are arranged from left to right (by transient).
+
+The group has an identifier. The identifier can be any type of value as long as it can be compared with the equal function. However, in the case of a string, it is used for display as the title of the group. In addition, in the case of symbols, etc., they are used only for identification and not for display.
+
+Since groups have a hierarchy, you need to specify in group-path (list of group identifiers) which group to add to.
+
+Specific example:
+- '("Common")
+- '("Table" "Navigation")
+- '(:table "Table Navi") ;; :table is not a string, so it is used for identification but not for the title
+
+Each time you add a command, a non-existent group is created and added to the end.
+
+*** Command Calling Convention
+
+When you add a command, you need to specify how to call it.
+
+- 'no-wrap :: Call as it is.
+- 'with-datum :: Call with the currently selected syntax element as the first argument.
+- 'at-begin :: Move the point to the beginning of the currently selected syntax element and call it.
+- 'at-post-affiliated :: Move and call the point immediately after the affiliated keyword of the currently selected syntax element.
+
+For example, consider the following situation.
+
+# + begin_src org
+1. Item1
+2. Item2
+3. Item3
+   - Item3-1 *Current point here*
+   - Item3-2
+# + end_src
+
+The current point is in the bold in the paragraph in the item in the plain-list (unordered) in the item in the plain-list (ordered).
+
+Users can switch the menu to all parent elements (plain-list, item, plain-list, item, paragraph, body) that wrap the current point. Therefore, the command may not be able to perform correct processing without knowing which element is currently selected.
+
+For example, a command that cuts the entire syntax element can cut * to * if the currently selected element is bold. But if plain-list is selected, the command must cut the two lines "-Item 3-1" and "-Item 3-2". In such a case, you need to specify'with-datum to pass the information of the syntax element to the first argument, or use the (org-cmenu-target-datum) function to get it.
+
+#+begin_src elisp
+(defun my-cut-element (datum)
+  (kill-region
+   (org-element-property :begin datum)
+   (org-element-property :end datum)))
+
+(defun my-copy-element (datum)
+  (kill-ring-save
+   (org-element-property :begin datum)
+   (org-element-property :end datum)))
+
+(org-cmenu-add-commands
+ '("Common")
+ '(("x" "Cut Element" my-cut-element)
+   ("c" "Copy Element" my-copy-element))
+ 'all
+ 'with-datum)
+#+end_src
+
+On the contrary, the information of the target syntax element may not be necessary. For example, consider the following situation.
+
+#+begin_src org
+abcdef | *Current point here* |
+ABCDEF | 123456 |
+#+end_src
+
+The syntax elements pointed to by the current point are bold, table-cell, table-row, and table.
+
+The command to move the contents of table-cell down (org-table-move-cell-down, which is included as standard in org-mode) only needs to have the current point on table-cell. Tables cannot be nested, so there is no ambiguity about which table-cell. In such a case, you can use the command as it is by setting the target type to'table-cell and specifying'no-wrap. Even if there is no argument, the target cell can be definitely identified from the current position.
+
+#+begin_src elisp
+(org-cmenu-add-commands
+ '("Table Cell")
+ '(("D" "Move Down" org-table-move-cell-down))
+ 'table-cell
+ 'no-wrap)
+#+end_src
+
+* Syntax Element Type
+
+org-element.el classifies the syntax elements of org-mode as follows:
 
 #+begin_example elisp
 (defconst org-element-all-elements
@@ -91,13 +296,15 @@ org-elements.el classifies org-mode syntax elements as follows:
   "Complete list of object types.")
 #+end_example
 
-See [[https://raw.githubusercontent.com/misohena/org-cmenu/main/examples/all-types.org][examples/all-types.org]] for specific examples of each type.
+In org-element.el, `object' refers to an inline element and `element' refers to a non-inline element, and any element that contains both is often called `datum'.
 
-The following aliases are available in org-cmenu:
+See [[https://raw.githubusercontent.com/misohena/org-cmenu/main/examples/all-types.org][examples/all-types.org]] for specific examples of each element type. [[https://github.com/misohena/org-cmenu/blob/main/org-cmenu-typedoc.el][org-cmenu-typedoc.el]] contains a list of correspondences between type names and URLs to the org-mode manual. If you press "?" From the menu of org-cmenu, the explanation of the selected syntax element will open in the browser, so please refer to it.
 
-- all :: org-element-all-elements and org-element-all-objects.
-- elements :: org-element-all-elements.
-- objects :: org-element-all-objects.
-- aff-elements :: Types that can have affiliated keywords.
-- com-elements :: Types that can be commented out.
-- contents :: Types with contents. See org-cmenu-contents-range function.
+In addition to using these type name symbols in org-cmenu, you can also use the following aliases:
+
+- all :: org-element-all-elements and org-element-all-objects types
+- elements :: org-element-all-elements types
+- objects :: org-element-all-objects types
+- aff-elements :: elements with Affiliated Keywords
+- com-elements :: elements that can be commented out
+- contents :: All types that can have contents (see org-cmenu-contents-range function)
