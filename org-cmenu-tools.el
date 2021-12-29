@@ -1001,5 +1001,64 @@ org-entities-user)."
                      (mapcar #'symbol-name org-export-backends))))
   (org-cmenu-insert-begin-end (format "@@%s:" backend) "@@"))
 
+
+;;;;; Insert Elements
+
+;; org-insert-drawer
+;; org-footnote-new
+;; org-insert-structure-template
+
+(defun org-cmenu-insert-babel-call ()
+  (interactive)
+  (org-cmenu-insert-begin-end "#+call: " "name(arg)"))
+
+(defun org-cmenu-insert-macro-definition ()
+  (interactive)
+  (org-cmenu-insert-begin-end "#+MACRO: " "name string-or-sexp $1 $2\n"))
+
+(defun org-cmenu-insert-fixed-width ()
+  (interactive)
+  (insert ": "))
+
+(defun org-cmenu-insert-horizontal-rule ()
+  (interactive)
+  (insert "-----\n"))
+
+;;@todo Add statistics cookie
+
+;;@todo Add functions to insert the following keywords.
+;; #+TEXT:
+;; #+TEXT: [TABLE-OF-CONTENTS]
+;; #+TEXT:
+;; #+TITLE, AUTHOR, DATE, EMAIL, DESCRIPTION, KEYWORDS, LANGUAGE:
+;; #+LINK_UP, LINK_HOME: url
+;; #+BIND:
+;; #+OPTIONS:
+;; #+CONSTANTS: c=299792458. pi=3.14 eps=2.4e-6
+;; #+STARTUP:
+;; #+LINK: google http://www.google.com/search?q=%s
+;; #+TODO: TODO FEEDBACK VERIFY | DONE CANCELED
+;; #+PRIORITIES: A C B
+;; #+FILETAGS: :Peter:Boss:Secret:
+;; #+TAGS: { @work(w)  @home(h)  @tennisclub(t) }  laptop(l)  pc(p)
+;; #+PROPERTY: NDisks_ALL 1 2 3 4
+;; #+COLUMNS: %25ITEM %TAGS %PRIORITY %TODO
+;; #+DRAWERS: LOGBOOK PROPERTIES FEEDSTATUS
+;; #+ARCHIVE: %s_done::
+;; #+CATEGORY: Holiday
+;; #+INCLUDE: "~/example.el" :lines "5-10" :prefix1 "" :prefix "" :minlevel 1 src elisp
+;; #+INDEX: Application!CV
+;; LATEX_HEADER
+;; EXPORT_SELECT_TAGS
+;; EXPORT_EXCLUDE_TAGS
+;; XSLT
+;; MATHJAX
+;; STYLE
+;; INFOJS_OPT
+;;(defun org-cmenu-insert-options ()
+;;  )
+
+
+
 (provide 'org-cmenu-tools)
 ;;; org-cmenu-tools.el ends here

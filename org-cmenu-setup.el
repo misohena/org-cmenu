@@ -583,7 +583,7 @@
     ""
     "Babel"
     ("C" "Inline Call" org-cmenu-insert-inline-babel-call)
-    ("s" "Inline Src" org-cmenu-insert-inline-src-block)]
+    ("S" "Inline Src" org-cmenu-insert-inline-src-block)]
    ["Others"
     ("e" "Entity" org-cmenu-insert-entity)
     ("l" "Link" org-insert-link)
@@ -591,8 +591,18 @@
     ("r" "Radio Target" org-cmenu-insert-radio-target)
     ("m" "Macro" org-cmenu-insert-macro)
     ("@" "Export Snippet" org-cmenu-insert-export-snippet)
+    ("f" "Footnote" org-footnote-new)
     ("RET" "Line Break" org-cmenu-insert-line-break) ;;exclude table-cell
-    ]])
+    ]
+   ["Elements"
+    :if (lambda () (eq (org-element-type (org-cmenu-target-datum)) 'section))
+    ("d" "Drawer" org-insert-drawer)
+    ("," "#+BEGIN_?" org-insert-structure-template)
+    ("a" "#+CALL" org-cmenu-insert-babel-call)
+    ("M" "#+MACRO" org-cmenu-insert-macro-definition)
+    (":" "Fixed Width" org-cmenu-insert-fixed-width)
+    ("-" "Horizontal" org-cmenu-insert-horizontal-rule)]
+   ])
 
 (org-cmenu-add-commands
  '(:basic "Insert")
@@ -601,8 +611,6 @@
            center-block quote-block special-block dynamic-block
            drawer footnote-definition)
  'no-wrap)
-
-;;@todo Add commands to insert element.
 
 ;;@todo Add commands to decorate region. bold, italic, etc.
 

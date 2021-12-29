@@ -103,7 +103,13 @@ Currently, the functions implemented in the default menu (defined in org-cmenu-s
   - Macro
   - Export snippet
   - Forced line breaks
-
+  - Footnote
+  - Drawer
+  - Various blocks
+  - CALL
+  - Macro definition
+  - Fixed width
+  - Horizontal Rule
 * Setup
 
 #+begin_src elisp
