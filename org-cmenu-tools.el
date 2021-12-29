@@ -896,27 +896,27 @@ Return t when the line exists, nil if it does not exist."
 
 (defun org-cmenu-insert-bold ()
   (interactive)
-  (org-cmenu-insert-begin-end "*"))
+  (org-emphasize ?*))
 
 (defun org-cmenu-insert-underline ()
   (interactive)
-  (org-cmenu-insert-begin-end "_"))
+  (org-emphasize ?_))
 
 (defun org-cmenu-insert-italic ()
   (interactive)
-  (org-cmenu-insert-begin-end "/"))
+  (org-emphasize ?/))
 
 (defun org-cmenu-insert-verbatim ()
   (interactive)
-  (org-cmenu-insert-begin-end "="))
+  (org-emphasize ?=))
 
 (defun org-cmenu-insert-code ()
   (interactive)
-  (org-cmenu-insert-begin-end "~"))
+  (org-emphasize ?~))
 
 (defun org-cmenu-insert-strike-through ()
   (interactive)
-  (org-cmenu-insert-begin-end "+"))
+  (org-emphasize ?+))
 
 (defun org-cmenu-insert-subscript ()
   (interactive)
