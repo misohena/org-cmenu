@@ -27,6 +27,7 @@
 (require 'org)
 (require 'org-cmenu)
 (require 'org-cmenu-tools)
+(require 'org-cmenu-typedoc)
 
 (defvar org-cmenu-setup-reset t)
 (when org-cmenu-setup-reset
