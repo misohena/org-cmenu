@@ -27,6 +27,16 @@ Example of working with a table:
 #+ATTR_HTML: :width 580
 [[file:./screenshot/org-cmenu-table.gif]]
 
+#+CAPTION: Plain List Menu
+[[file:screenshot/org-cmenu_plain-list.png]]
+
+#+CAPTION: Insert menu
+[[file:screenshot/org-cmenu-insert.png]]
+
+#+CAPTION: Entity Menu
+[[file:screenshot/org-cmenu-pretty.png]]
+
+
 * Features implemented in the default menu
 
 Currently, the functions implemented in the default menu (defined in org-cmenu-setup.el) are as follows.

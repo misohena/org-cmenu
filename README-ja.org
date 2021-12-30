@@ -16,14 +16,21 @@
 画像リンクに対して、キャプションとHTML属性を設定し、コメントアウトし、再びコメント化解除をする例:
 
 #+CAPTION: Set CAPTION, ATTR_HTML, comment, and uncomment for image links.
-#+ATTR_HTML: :width 400
 [[file:./screenshot/org-cmenu-image-link.gif]]
 
 表をいろいろ操作する例:
 
 #+CAPTION: Cut and paste or move part of the table.
-#+ATTR_HTML: :width 580
 [[file:./screenshot/org-cmenu-table.gif]]
+
+#+CAPTION: Plain List Menu
+[[file:screenshot/org-cmenu_plain-list.png]]
+
+#+CAPTION: Insert menu
+[[file:screenshot/org-cmenu-insert.png]]
+
+#+CAPTION: Entity Menu
+[[file:screenshot/org-cmenu-pretty.png]]
 
 * デフォルトのメニューで実装している機能
 
