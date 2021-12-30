@@ -90,7 +90,7 @@ Currently, the functions implemented in the default menu (defined in org-cmenu-s
   - Open (default, system priority, Emacs priority)
   - Copy of path
   - Display file information
--Statistics Cookie (like [1/3])
+- Statistics Cookie (like [1/3])
   - Update
 - Various additions to paragraphs, table cells, list items, various blocks, etc.
   - Bold, underlined, italic, verbatim, code, strikethrough
