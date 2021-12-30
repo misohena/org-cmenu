@@ -290,7 +290,7 @@
  'no-wrap)
 (org-cmenu-add-commands
  '(:table "Table2")
- '(("a" "Align" org-table-align)
+ '(("A" "Align" org-table-align)
    ("e" "Export File" org-table-export)
    ("S" "Copy as S-Exp" org-cmenu-table-copy-as-sexp))
  '(table :forced t)
