@@ -76,6 +76,7 @@
 ;; - org-keys.el
 ;; - (org-speed-command-help)
 
+;;@todo Fix getting out of the headline
 (org-cmenu-add-commands
  '(:headline "Navi")
  '(("u" "Up" outline-up-heading :transient t)
@@ -176,10 +177,10 @@
 ;;;;; plain-list
 (org-cmenu-add-commands
  '(:list "List")
- `(("S" "Copy as S-Exp" org-cmenu-plain-list-copy-as-sexp) ;;@todo Do only the current target list or enable only at top level
-   ("t" "Make Subtree" org-list-make-subtree) ;;@todo enable only at top level
+ `(("S" "Copy as S-Exp" org-cmenu-plain-list-copy-as-sexp)
+   ("t" "Make Subtree" org-cmenu-plain-list-make-subtree)
    ("s" "Sort" ,(org-cmenu-wrap-command-at-post-affiliated #'org-sort-list))
-   ("r" "Repair" ,(org-cmenu-wrap-command-at-post-affiliated #'org-list-repair)) ;;@todo Do only the current target list or enable only at top level
+   ("r" "Repair" org-cmenu-plain-list-repair)
    ("b" "Checkbox On/Off"
     (lambda () (interactive)
       (org-cmenu-mark-datum (org-cmenu-target-datum))

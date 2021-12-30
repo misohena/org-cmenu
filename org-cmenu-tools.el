@@ -44,6 +44,17 @@
    ;;'(link paragraph item plain-list).
    (org-element-lineage (or element (org-element-context)) nil t)))
 
+(defun org-cmenu-narrow-to-datum (datum)
+  (interactive (list (org-element-context)))
+  (narrow-to-region
+   (org-element-property :begin datum)
+   (org-element-property :end datum)))
+
+(defun org-cmenu-under-section-p (datum)
+  (member
+   (org-element-type (org-element-property :parent datum))
+   '(nil section)))
+
 ;;;; Predicates
 
 (defun org-cmenu-element-p (datum)
@@ -543,11 +554,27 @@
 
 ;;;; Plain List
 
-(put 'org-cmenu-plain-list-copy-as-sexp 'org-cmenu '(:target plain-list)) ;;@todo Do only the current target list or enable only at top level
+(put 'org-cmenu-plain-list-make-subtree 'org-cmenu
+     '(:target (plain-list :pred org-cmenu-under-section-p)))
+(defun org-cmenu-plain-list-make-subtree (datum)
+  (save-excursion
+    (save-restriction
+      (org-list-make-subtree))))
+
+(put 'org-cmenu-plain-list-repair 'org-cmenu '(:target plain-list))
+(defun org-cmenu-plain-list-repair (datum)
+  (save-excursion
+    (save-restriction
+      (org-cmenu-narrow-to-datum datum)
+      (org-list-repair))))
+
+(put 'org-cmenu-plain-list-copy-as-sexp 'org-cmenu '(:target plain-list))
 (defun org-cmenu-plain-list-copy-as-sexp (datum)
   (save-excursion
-    (goto-char (org-element-property :post-affiliated datum))
-    (kill-new (pp (org-list-to-lisp)))))
+    (save-restriction
+      (org-cmenu-narrow-to-datum datum)
+      (goto-char (org-element-property :post-affiliated datum))
+      (kill-new (pp (org-list-to-lisp))))))
 
 ;;;; Table
 ;;;;; S-Exp
