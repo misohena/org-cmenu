@@ -326,6 +326,10 @@ alpha=\alpha{} , beta=\beta{}
 
 ** link
 
+<file:./picture1.jpg>
+
+file:./picture1.jpg
+
 [[*All Types][All Types(Internal Link)]]
 
 #+ATTR_HTML: :style border: solid 2px red; padding: 2px; display: inline-block

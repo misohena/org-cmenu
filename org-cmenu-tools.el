@@ -538,6 +538,58 @@
 
     (org-cmenu-show-file-info path)))
 
+(put 'org-cmenu-link-rename-file 'org-cmenu
+     '(:target (link :pred org-cmenu-exists-file-link-p)))
+(defun org-cmenu-link-rename-file (link)
+  (let* ((type (org-element-property :type link))
+         (path (org-element-property :path link))
+         (abs-p (file-name-absolute-p path))
+         (abs-path (expand-file-name path)))
+    (unless (equal type "file")
+      (error "type=%s" type))
+    (unless (file-exists-p abs-path)
+      (error "File not exists : %s" abs-path))
+
+    (let* ((new-file
+            (read-file-name "File Name: "
+                            (file-name-directory abs-path)
+                            nil
+                            nil
+                            (file-name-nondirectory abs-path)))
+           (new-file
+            (if (string-empty-p (file-name-nondirectory new-file))
+                (concat new-file (file-name-nondirectory abs-path))
+              new-file))
+           (new-link-path
+            (concat "file:"
+                    (if abs-p
+                        (expand-file-name new-file)
+                      (file-relative-name new-file)))))
+      (rename-file abs-path new-file)
+      (org-cmenu-link-replace-at-point new-link-path 'path)
+      (message "Changed the file name to %s\n(%s)"
+               new-file new-link-path))))
+
+(defun org-cmenu-link-replace-at-point (new-text part)
+  (cond
+   ((org-in-regexp org-link-bracket-re 1)
+    (replace-match new-text t t nil
+                   (pcase part
+                     ('link 0)
+                     ('path 1)
+                     ('description 2)))
+    t)
+   ((org-in-regexp org-link-angle-re)
+    (pcase part
+      ('link (replace-match new-text t t nil 0) t)
+      ('path (replace-match (concat "<" new-text ">") t t nil 0) t)
+      ('description nil)))
+   ((org-in-regexp org-link-plain-re)
+    (pcase part
+      ('link (replace-match new-text t t nil 0) t)
+      ('path (replace-match new-text t t nil 0) t)
+      ('description nil)))))
+
 ;;@todo impl
 ;; (defun org-cmenu-file-link-open-source (link)
 ;;   (interactive)

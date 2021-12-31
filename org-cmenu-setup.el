@@ -540,10 +540,16 @@
    ("o" "Open" org-cmenu-link-open-by-default)
    ("x" "Open by system" org-cmenu-link-open-by-system)
    ("i" "Open by emacs" org-cmenu-link-open-by-emacs)
-   ("d" "Open Directory" org-cmenu-link-open-directory)
-   ("cp" "Copy Path" org-cmenu-link-copy-path)
+   ("cp" "Copy Path" org-cmenu-link-copy-path))
+ '(link)
+ 'no-wrap)
+
+(org-cmenu-add-commands
+ '(:link "File")
+ '(("d" "Open Directory" org-cmenu-link-open-directory)
    ("cf" "Copy File Name" org-cmenu-link-copy-file-name)
-   ("fi" "Info" org-cmenu-link-show-file-info))
+   ("fi" "Info" org-cmenu-link-show-file-info)
+   ("fr" "Rename" org-cmenu-link-rename-file))
  '(link)
  'no-wrap)
 
