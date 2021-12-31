@@ -535,7 +535,7 @@
 ;;;;; link
 (org-cmenu-add-commands
  '(:link "Link")
- '(("l" "Edit Path and Description" org-insert-link)
+ '(("e" "Edit Path/Desc" org-insert-link)
    ("o" "Open" org-cmenu-link-open-by-default)
    ("x" "Open by system" org-cmenu-link-open-by-system)
    ("i" "Open by emacs" org-cmenu-link-open-by-emacs)
