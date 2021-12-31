@@ -35,7 +35,8 @@
 
 ;;;; All
 
-(org-cmenu-add-group 'all '(:hidden) :hide '(lambda () t))
+(org-cmenu-add-group 'all '(:hidden) :hide t)
+
 (org-cmenu-add-commands
  '(:hidden)
  '(("C-l" "Recenter" recenter :transient t)
@@ -140,7 +141,8 @@
  '(headline)
  'no-wrap)
 
-(org-cmenu-add-group '(headline) '(:headline-hidden) :hide '(lambda () t))
+(org-cmenu-add-group '(headline) '(:headline-hidden) :hide t)
+
 (org-cmenu-add-commands
  '(:headline-hidden)
  '(("C-u" "Up" outline-up-heading :transient t)
@@ -271,6 +273,8 @@
 
 ;; @todo Add Gnu Plot support?
 
+(org-cmenu-add-group '(table table-row table-cell) '(:table-hidden) :hide t)
+
 (org-cmenu-add-commands
  '(:table "Table")
  '(("}" "Toggle Coordinate" org-table-toggle-coordinate-overlays :transient t)
@@ -283,11 +287,13 @@
    ("S-TAB" "Cycle Width" org-cmenu-table-cycle-column-width :transient t))
  '(table table-row table-cell)
  'no-wrap)
+
 (org-cmenu-add-commands
- '(:hidden)
+ '(:table-hidden)
  '(("<backtab>" "Cycle Width" org-cmenu-table-cycle-column-width :transient t))
  '(table table-row table-cell)
  'no-wrap)
+
 (org-cmenu-add-commands
  '(:table "Table2")
  '(("A" "Align" org-table-align)
@@ -350,7 +356,7 @@
  '(table-row table-cell)
  'no-wrap)
 (org-cmenu-add-commands
- '(:hidden)
+ '(:table-hidden)
  '(("r C-p" "Move Up" org-cmenu-table-move-row)
    ("r C-n" "Move Down" org-cmenu-table-move-row)
    ("l C-p" "Move Up" org-cmenu-table-move-line)
@@ -394,7 +400,7 @@
  '(table-cell)
  'no-wrap)
 (org-cmenu-add-commands
- '(:hidden)
+ '(:table-hidden)
  '(("c C-f" "Move Right" org-cmenu-table-move-column)
    ("c C-b" "Move Left" org-cmenu-table-move-column)
    ("l C-f" "Move Right" org-cmenu-table-move-line)
@@ -442,7 +448,7 @@
  'no-wrap)
 
 (org-cmenu-add-commands
- '(:hidden)
+ '(:table-hidden)
  '(("<S-right>" "Move Cell Right" org-table-move-cell-right :transient t)
    ("<S-left>" "Move CellLeft" org-table-move-cell-left :transient t)
    ("<S-up>" "Move Cell Up" org-table-move-cell-up :transient t)
@@ -468,7 +474,7 @@
 ;; Navigation
 
 (org-cmenu-add-commands
- '(:table-move-point-hidden)
+ '(:table-hidden)
  '(("C-b" "Left" org-cmenu-table-previous-column :transient t)
    ("C-f" "Right" org-cmenu-table-next-column :transient t)
    ("C-p" "Up" org-cmenu-table-previous-row :transient t)
@@ -479,10 +485,6 @@
    ("M->" "Last Field" org-cmenu-table-last-field-in-table :transient t))
  '(table-cell)
  'no-wrap)
-(org-cmenu-set-group-property
- '(table-cell)
- '(:table-move-point-hidden)
- :hide '(lambda () t))
 
 (org-cmenu-add-string '(table-cell) '(:basic "Navigation")
                       "C-b,f,p,n,a,e M-<,>")
