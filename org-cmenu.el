@@ -322,6 +322,18 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
   (setf (org-cmenu-group-props group)
         (plist-put (org-cmenu-group-props group) key value)))
 
+(defun org-cmenu-group-transient-props (group)
+  (cl-loop
+   for p on (org-cmenu-group-props group) by #'cddr
+   nconc
+   (pcase p
+     ;; :hide boolean => :hide (lambda () boolean)
+     (`(:hide ,(and (pred booleanp) value) . ,_)
+      (list :hide (lambda () value)))
+     ;; key value
+     (`(,key ,value . ,_)
+      (list key value)))))
+
 (defun org-cmenu-group-to-transient-spec (group)
   (apply
    #'vector
@@ -333,7 +345,7 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
      (let ((group-id (org-cmenu-group-id group)))
        (when (stringp group-id) (list group-id)))
      ;; Properties
-     (org-cmenu-group-props group)
+     (org-cmenu-group-transient-props group)
      ;; Elements
      (mapcar
       (lambda (elm)
