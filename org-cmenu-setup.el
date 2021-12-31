@@ -546,6 +546,22 @@
  '(link)
  'no-wrap)
 
+(org-cmenu-add-commands
+ '(:link "Navigation")
+ '(("p" "Prev Link" org-previous-link :transient t)
+   ("n" "Next Link" org-next-link :transient t))
+ '(link)
+ 'no-wrap)
+
+(org-cmenu-add-group '(link) '(:link-hidden) :hide t)
+
+(org-cmenu-add-commands
+ '(:link-hidden)
+ '(("C-p" "Prev Link" org-previous-link :transient t)
+   ("C-n" "Next Link" org-next-link :transient t))
+ '(link)
+ 'no-wrap)
+
 ;;;;; latex-fragment
 ;;;;; macro
 
