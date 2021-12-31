@@ -50,6 +50,7 @@
  '(("m" "Mark" org-cmenu-mark-datum)
    ("C-w" "Kill" org-cmenu-kill-datum)
    ("M-w" "Copy" org-cmenu-copy-datum)
+   ("N" "Narrow/Widen" org-cmenu-toggle-narrow-datum)
    ("?" "Manual" org-cmenu-browse-type-document)
    (";" "Comment" org-cmenu-comment-element)))
 
@@ -58,6 +59,7 @@
  '(("[ m" "Mark" org-cmenu-mark-contents)
    ("[ C-w" "Kill" org-cmenu-kill-contents)
    ("[ M-w" "Copy" org-cmenu-copy-contents)
+   ("[ N" "Narrow/Widen" org-cmenu-toggle-narrow-contents)
    ("[ e" "Expose" org-cmenu-expose-contents)))
 
 (org-cmenu-add-commands
@@ -92,8 +94,7 @@
 (org-cmenu-add-commands
  '(:headline2 "Visibility")
  '(("TAB" "Cycle" org-cycle :transient t)
-   ("S-TAB" "Cycle" org-shifttab :transient t)
-   ("N" "Narrow/Wide" org-toggle-narrow-to-subtree :transient t))
+   ("S-TAB" "Cycle" org-shifttab :transient t))
  '(headline)
  'no-wrap)
 

@@ -72,9 +72,12 @@
                  (seq-find
                   (lambda (e) (eq (org-element-type e) 'link))
                   (org-element-parse-secondary-string
-                   (buffer-substring
-                    (org-element-property :begin parent)
-                    (org-element-property :end parent))
+                   (save-excursion
+                     (save-restriction
+                       (widen)
+                       (buffer-substring
+                        (org-element-property :begin parent)
+                        (org-element-property :end parent))))
                    '(link)
                    (org-element-property :parent parent))))
                 -1)
@@ -95,16 +98,19 @@
           (and
            parent
            (eq (org-element-type parent) 'paragraph)
-           (not
-            (or
-             (org-string-nw-p
-              (buffer-substring
-               (org-element-property :post-affiliated parent)
-               (org-element-property :begin datum)))
-             (org-string-nw-p
-              (buffer-substring
-               (org-element-property :end datum)
-               (org-element-property :end parent))))))))))
+           (save-excursion
+             (save-restriction
+               (widen)
+               (not
+                (or
+                 (org-string-nw-p
+                  (buffer-substring
+                   (org-element-property :post-affiliated parent)
+                   (org-element-property :begin datum)))
+                 (org-string-nw-p
+                  (buffer-substring
+                   (org-element-property :end datum)
+                   (org-element-property :end parent))))))))))))
 
 (defun org-cmenu-element-or-standalone-link-p (datum)
   (or (not (eq (org-element-type datum) 'link))
@@ -296,6 +302,13 @@
   (org-cmenu-mark-datum datum)
   (call-interactively #'kill-ring-save))
 
+(put 'org-cmenu-toggle-narrow-datum 'org-cmenu '(:target all))
+(defun org-cmenu-toggle-narrow-datum (&optional datum)
+  (interactive)
+  (if (buffer-narrowed-p)
+      (widen)
+    (org-cmenu-narrow-to-datum datum)))
+
 ;;;;; Contents
 
 (put 'org-cmenu-mark-contents 'org-cmenu '(:target contents))
@@ -327,6 +340,16 @@
   ;;@todo Support comment, fixed-width
   (org-cmenu-mark-contents datum)
   (call-interactively #'kill-ring-save))
+
+(put 'org-cmenu-toggle-narrow-contents 'org-cmenu '(:target contents))
+(defun org-cmenu-toggle-narrow-contents (&optional datum)
+  (interactive)
+  (if (buffer-narrowed-p)
+      (widen)
+    (let* ((range (org-cmenu-contents-range datum))
+           (begin (car range))
+           (end (cdr range)))
+      (narrow-to-region begin end))))
 
 (defun org-cmenu-find-contents-range (datum begin-regexp end-regexp)
   (let ((begin (org-element-property :begin datum))
