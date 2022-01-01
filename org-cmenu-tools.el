@@ -573,11 +573,10 @@
 (defun org-cmenu-link-replace-at-point (new-text part)
   (cond
    ((org-in-regexp org-link-bracket-re 1)
-    (replace-match new-text t t nil
-                   (pcase part
-                     ('link 0)
-                     ('path 1)
-                     ('description 2)))
+    (pcase part
+      ('link (replace-match (org-link-escape new-text) t t nil 0))
+      ('path (replace-match (org-link-escape new-text) t t nil 1))
+      ('description (replace-match new-text t t nil 2)))
     t)
    ((org-in-regexp org-link-angle-re)
     (pcase part
