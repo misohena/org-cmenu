@@ -458,13 +458,14 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
 
 ;;;; Menu
 
-(defvar org-cmenu-saved-point nil)
-(defvar org-cmenu-saved-mark nil)
-(defvar org-cmenu-pointed-datum nil)
-(defvar org-cmenu-pointed-path nil)
-(defvar org-cmenu-target-datum nil)
+(defvar org-cmenu-pointed-path-dirty nil) ;; org-cmenu-reset-context, org-cmenu-on-pre-command
+(defvar org-cmenu-pointed-path nil) ;; org-cmenu-reset-context
+(defvar org-cmenu-target-datum nil) ;; org-cmenu-reset-context, org-cmenu-open-internal
+;;org-cmenu-on-setup ~ org-cmenu-on-pre-command
 (defvar org-cmenu-open-p nil)
 (defvar org-cmenu-mark-active-p nil)
+(defvar org-cmenu-saved-point nil)
+(defvar org-cmenu-saved-mark nil)
 
 (defun org-cmenu-pointed-path-string ()
   "Return the current path string for menu display."
@@ -545,10 +546,6 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
   ;;(message "Save mark(%s) and point(%s)" org-cmenu-saved-mark org-cmenu-saved-point)
   )
 
-(defun org-cmenu-save-mark-and-point--save ()
-  )
-
-
 (defun org-cmenu-restore-mark-and-point ()
   ;;(message "Restore mark(%s) and point(%s)" org-cmenu-saved-mark org-cmenu-saved-point)
   (goto-char org-cmenu-saved-point)
@@ -582,21 +579,47 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
 
 ;; Open/Close
 
-(defun org-cmenu-on-setup ()
-  ;;(message "on-setup org-cmenu-open-p=%s" org-cmenu-open-p)
-  (unless org-cmenu-open-p
-    (let* ((path (org-cmenu-element-lineage))
-           (datum (car path)))
-      (unless (eq (org-element-type datum)
-                  (org-element-type org-cmenu-pointed-datum))
-        (error "The type of element currently pointing has changed"))
+;; org-cmenu => on-setup
+;; => on-pre-command
+;;    => org-cmenu-select-[parent|child] => open-internal => on-setup
+;;    => transient-* => on-setup
+;;    => COMMAND(:transient t) => on-setup
+;;    => COMMAND => end
+;; => on-setup (?)
 
-      (unless (and (equal (org-element-property :begin datum)
-                          (org-element-property :begin org-cmenu-pointed-datum))
-                   (equal (org-element-property :end datum)
-                          (org-element-property :end org-cmenu-pointed-datum)))
-        ;; If it is the same type, it can be continued.
-        (org-cmenu-reset-pointed-datum path)))
+(defun org-cmenu-on-setup ()
+  ;;(message "[cmenu]on-setup open-p=%s pointed-path-dirty=%s this-command=%s last-command=%s" org-cmenu-open-p org-cmenu-pointed-path-dirty this-command last-command)
+  (unless org-cmenu-open-p
+    ;; Fix path and target.
+    (when org-cmenu-pointed-path-dirty
+      (let ((new-path (org-cmenu-element-lineage))
+            (menu-type (org-element-type org-cmenu-target-datum))) ;;current menu type
+
+        (cond
+         ((equal new-path org-cmenu-pointed-path)
+          ;;(message "[cmenu]Completely same path structure! Do nothing")
+          )
+
+         ((let* ((index (seq-position (reverse org-cmenu-pointed-path)
+                                      org-cmenu-target-datum #'eq))
+                 (new-target-same-index (nth index (reverse new-path))))
+            (when (eq (org-element-type new-target-same-index)
+                      menu-type) ;;same type
+              ;;(message "[cmenu]Changed but continue same index and same type. Set new path and target")
+              (org-cmenu-reset-context new-path new-target-same-index)
+              t)))
+
+         ((let ((new-target-same-type
+                 (seq-find (lambda (d) (eq (org-element-type d) menu-type))
+                           new-path)))
+            (when new-target-same-type
+              ;;(message "[cmenu]Lost path but continue same type datum. Set new path and target")
+              (org-cmenu-reset-context new-path new-target-same-type)
+              t)))
+
+         (t
+          ;;@todo Safely exit the menu
+          (error "Menu type mismatch")))))
 
     (setq org-cmenu-open-p t)
     ;; Save mark and point.
@@ -612,28 +635,30 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
   (org-cmenu-pointed-path-string))
 
 (defun org-cmenu-on-pre-command ()
-  ;; (message "on-pre-command")
+  ;;(message "[cmenu]on-pre-command this-command=%s last-command" this-command last-command)
   (when org-cmenu-open-p
     (unless org-cmenu-mark-active-p
       (org-cmenu-unhighlight-datum))
     (setq org-cmenu-mark-active-p nil)
     (setq org-cmenu-open-p nil)
+    (setq org-cmenu-pointed-path-dirty t)
     (org-cmenu-restore-mark-and-point)
     ;;(remove-hook 'org-cmenu-transient-pre-exit-hook #'org-cmenu-on-pre-exit)
     (remove-hook 'pre-command-hook #'org-cmenu-on-pre-command)))
 
 (defun org-cmenu-open-internal (datum)
-  (let ((type-id (org-element-type datum)))
-    ;; Update transient prefix
-    (when org-cmenu-update-transient-prefix-everytime
-      (org-cmenu-define-transient-prefix-for-type type-id))
+  (when org-cmenu-pointed-path
+    (let ((type-id (org-element-type datum)))
+      ;; Update transient prefix
+      (when org-cmenu-update-transient-prefix-everytime
+        (org-cmenu-define-transient-prefix-for-type type-id))
 
-    ;; Set target datum
-    (setq org-cmenu-target-datum datum)
+      ;; Set target datum
+      (setq org-cmenu-target-datum datum)
 
-    ;; Invoke transient prefix
-    (call-interactively
-     (intern (format "org-cmenu-transient-prefix-%s" type-id)))))
+      ;; Invoke transient prefix
+      (call-interactively
+       (intern (format "org-cmenu-transient-prefix-%s" type-id))))))
 
 ;; Beginning of Menu
 
@@ -648,15 +673,14 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
          (datum (car path)))
     (unless datum
       (error "No elements"))
-    (org-cmenu-reset-pointed-datum path)
+    (org-cmenu-reset-context path datum)
+    (org-cmenu-open-internal datum)))
 
-    (org-cmenu-open-internal  datum)))
-
-(defun org-cmenu-reset-pointed-datum (path)
+(defun org-cmenu-reset-context (path target-datum)
   ;; Set current point information.
-  (setq org-cmenu-pointed-datum (car path))
   (setq org-cmenu-pointed-path path)
-  (setq org-cmenu-target-datum (car path)))
+  (setq org-cmenu-pointed-path-dirty nil)
+  (setq org-cmenu-target-datum target-datum))
 
 ;;;; Wrap Command
 
