@@ -332,7 +332,14 @@
 
 ;;;;; Contents
 
-(put 'org-cmenu-mark-contents 'org-cmenu '(:target contents))
+(defun org-cmenu-has-non-empty-contents-p (datum)
+  (let* ((range (ignore-errors (org-cmenu-contents-range datum)))
+         (begin (car range))
+         (end (cdr range)))
+    (and begin end (< begin end))))
+
+(put 'org-cmenu-mark-contents 'org-cmenu
+     '(:target (contents :pred org-cmenu-has-non-empty-contents-p)))
 (defun org-cmenu-mark-contents (&optional datum)
   (interactive)
   (unless datum
@@ -348,21 +355,24 @@
     (push-mark (point) nil t)
     (goto-char begin)))
 
-(put 'org-cmenu-kill-contents 'org-cmenu '(:target contents))
+(put 'org-cmenu-kill-contents 'org-cmenu
+     '(:target (contents :pred org-cmenu-has-non-empty-contents-p)))
 (defun org-cmenu-kill-contents (&optional datum)
   (interactive)
   ;;@todo Support comment, fixed-width
   (org-cmenu-mark-contents datum)
   (call-interactively #'kill-region))
 
-(put 'org-cmenu-copy-contents 'org-cmenu '(:target contents))
+(put 'org-cmenu-copy-contents 'org-cmenu
+     '(:target (contents :pred org-cmenu-has-non-empty-contents-p)))
 (defun org-cmenu-copy-contents (&optional datum)
   (interactive)
   ;;@todo Support comment, fixed-width
   (org-cmenu-mark-contents datum)
   (call-interactively #'kill-ring-save))
 
-(put 'org-cmenu-toggle-narrow-contents 'org-cmenu '(:target contents))
+(put 'org-cmenu-toggle-narrow-contents 'org-cmenu
+     '(:target (contents :pred org-cmenu-has-non-empty-contents-p)))
 (defun org-cmenu-toggle-narrow-contents (&optional datum)
   (interactive)
   (if (buffer-narrowed-p)
