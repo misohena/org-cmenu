@@ -243,14 +243,30 @@
 
 ;;;; Comment
 
-(put 'org-cmenu-comment-element 'org-cmenu '(:target com-elements))
+(defconst org-cmenu-types-can-comment-out
+  (seq-difference org-element-all-elements '(item table-row)))
+
+(defconst org-cmenu-types-cannot-comment-out
+  (append org-element-all-objects '(item table-row)))
+
+(put 'org-cmenu-comment-element 'org-cmenu
+     `(:target ,org-cmenu-types-can-comment-out))
 (defun org-cmenu-comment-element (&optional element)
   "Comment the element around point."
-  (interactive)
-  (unless element
-    (setq element (org-cmenu-enclosing-element nil '(item table-row table-cell))))
+  (interactive (list (org-element-lineage (org-element-at-point)
+                                          org-cmenu-types-can-comment-out t)))
+
   (unless element
     (error "No element"))
+
+  (unless (memq (org-element-type element)
+                org-cmenu-types-can-comment-out)
+    ;; (error "%s is a type that cannot be commented out"
+    ;;        (org-element-type element))
+    (setq element
+          (org-element-lineage element org-cmenu-types-can-comment-out t))
+    (unless element
+      (error "There are no elements that can be commented out")))
 
   (let ((begin (org-element-property :begin element))
         (end (org-element-property :end element)))
@@ -267,6 +283,11 @@
     ;; Comment
     (let ((comment-empty-lines t))
       (comment-region begin end))))
+
+(put 'org-cmenu-comment-enclosing-element 'org-cmenu
+     `(:target ,org-cmenu-types-cannot-comment-out))
+(defun org-cmenu-comment-enclosing-element (datum)
+  (org-cmenu-comment-element datum))
 
 ;;;; Region
 

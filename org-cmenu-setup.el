@@ -46,6 +46,10 @@
  'no-wrap)
 
 (org-cmenu-add-commands
+ '(:basic "Outside")
+ '((";" "Comment" org-cmenu-comment-enclosing-element)))
+
+(org-cmenu-add-commands
  '(:basic "Whole")
  '(("m" "Mark" org-cmenu-mark-datum)
    ("C-w" "Kill" org-cmenu-kill-datum)
