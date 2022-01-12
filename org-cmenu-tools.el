@@ -815,7 +815,7 @@ Return t when the line exists, nil if it does not exist."
 ;;;;; Move Point
 
 (put 'org-cmenu-table-previous-column 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-previous-column ()
   (interactive)
   (when (org-at-table-p)
@@ -824,7 +824,7 @@ Return t when the line exists, nil if it does not exist."
       (goto-char (match-end 1)))))
 
 (put 'org-cmenu-table-next-column 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-next-column ()
   (interactive)
   (when (org-at-table-p)
@@ -832,7 +832,7 @@ Return t when the line exists, nil if it does not exist."
       (goto-char (match-beginning 1)))))
 
 (put 'org-cmenu-table-previous-row 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-previous-row ()
   (interactive)
   (when (org-at-table-p)
@@ -842,7 +842,7 @@ Return t when the line exists, nil if it does not exist."
         (org-cmenu-table-goto-column col)))))
 
 (put 'org-cmenu-table-next-row 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-next-row ()
   (interactive)
   (when (org-at-table-p)
@@ -851,7 +851,7 @@ Return t when the line exists, nil if it does not exist."
         (org-cmenu-table-goto-column col)))))
 
 (put 'org-cmenu-table-first-column-in-row 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-first-column-in-row ()
   (interactive)
   (when (org-at-table-p)
@@ -859,7 +859,7 @@ Return t when the line exists, nil if it does not exist."
     (org-cmenu-table-next-column)))
 
 (put 'org-cmenu-table-last-column-in-row 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-last-column-in-row ()
   (interactive)
   (while (org-cmenu-table-next-column)))
@@ -867,7 +867,7 @@ Return t when the line exists, nil if it does not exist."
 ;;
 
 (put 'org-cmenu-table-first-row 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-first-row ()
   (interactive)
   (when (org-at-table-p)
@@ -876,7 +876,7 @@ Return t when the line exists, nil if it does not exist."
         (org-cmenu-table-goto-column col)))))
 
 (put 'org-cmenu-table-last-row 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-last-row ()
   (interactive)
   (when (org-at-table-p)
@@ -885,7 +885,7 @@ Return t when the line exists, nil if it does not exist."
         (org-cmenu-table-goto-column col)))))
 
 (put 'org-cmenu-table-first-field-in-table 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-first-field-in-table ()
   (interactive)
   (when (and (org-at-table-p)
@@ -893,7 +893,7 @@ Return t when the line exists, nil if it does not exist."
     (org-cmenu-table-goto-column 1)))
 
 (put 'org-cmenu-table-last-field-in-table 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-last-field-in-table ()
   (interactive)
   (when (and (org-at-table-p)
@@ -903,7 +903,7 @@ Return t when the line exists, nil if it does not exist."
 ;;;;; Mark
 
 (put 'org-cmenu-table-mark-all 'org-cmenu
-     '(:target (table table-row table-cell) :call no-warp))
+     '(:target (table table-row table-cell) :call no-wrap))
 (defun org-cmenu-table-mark-all ()
   (interactive)
   (when (org-at-table-p)
@@ -915,7 +915,7 @@ Return t when the line exists, nil if it does not exist."
     t))
 
 (put 'org-cmenu-table-mark-row 'org-cmenu
-     '(:target (table-row table-cell) :call no-warp))
+     '(:target (table-row table-cell) :call no-wrap))
 (defun org-cmenu-table-mark-row ()
   (interactive)
   (when (org-at-table-p)
@@ -929,7 +929,7 @@ Return t when the line exists, nil if it does not exist."
     t))
 
 (put 'org-cmenu-table-mark-column 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-mark-column ()
   (interactive)
   (when (org-at-table-p)
@@ -941,7 +941,7 @@ Return t when the line exists, nil if it does not exist."
         t))))
 
 (put 'org-cmenu-table-mark-field 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-mark-field ()
   (interactive)
   (when (org-at-table-p)
@@ -954,14 +954,14 @@ Return t when the line exists, nil if it does not exist."
 ;;;;; Region
 
 (put 'org-cmenu-table-cut-region 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-cut-region ()
   (interactive)
   (org-table-save-field
    (call-interactively #'org-table-cut-region)))
 
 (put 'org-cmenu-table-copy-region 'org-cmenu
-     '(:target table-cell :call no-warp))
+     '(:target table-cell :call no-wrap))
 (defun org-cmenu-table-copy-region ()
   (interactive)
   (org-table-save-field
