@@ -102,6 +102,9 @@ Currently, the functions implemented in the default menu (defined in org-cmenu-s
   - Display file information
 - Statistics Cookie (like [1/3])
   - Update
+- For the entire buffer
+   - Addition of option keyword
+   - Addition of title information
 - Various additions to paragraphs, table cells, list items, various blocks, etc.
   - Bold, underlined, italic, verbatim, code, strikethrough
   - Superscript, subscript
@@ -120,6 +123,7 @@ Currently, the functions implemented in the default menu (defined in org-cmenu-s
   - Macro definition
   - Fixed width
   - Horizontal Rule
+  - Option keyword
 * Setup
 
 #+begin_src elisp
@@ -326,3 +330,4 @@ In addition to using these type name symbols in org-cmenu, you can also use the 
 - aff-elements :: elements with Affiliated Keywords
 - com-elements :: elements that can be commented out
 - contents :: All types that can have contents (see org-cmenu-contents-range function)
+- buffer :: represents the entire buffer

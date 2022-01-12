@@ -244,7 +244,9 @@
 ;;;; Comment
 
 (defconst org-cmenu-types-can-comment-out
-  (seq-difference org-element-all-elements '(item table-row)))
+  (cons
+   'buffer
+   (seq-difference org-element-all-elements '(item table-row))))
 
 (defconst org-cmenu-types-cannot-comment-out
   (append org-element-all-objects '(item table-row)))
@@ -291,7 +293,7 @@
 
 ;;;; Region
 
-(put 'org-cmenu-mark-datum 'org-cmenu '(:target all))
+(put 'org-cmenu-mark-datum 'org-cmenu '(:target (all buffer)))
 (defun org-cmenu-mark-datum (&optional datum)
   (interactive)
   (unless datum
@@ -311,13 +313,13 @@
     (push-mark (point) nil t)
     (goto-char begin)))
 
-(put 'org-cmenu-kill-datum 'org-cmenu '(:target all))
+(put 'org-cmenu-kill-datum 'org-cmenu '(:target (all buffer)))
 (defun org-cmenu-kill-datum (&optional datum)
   (interactive)
   (org-cmenu-mark-datum datum)
   (call-interactively #'kill-region))
 
-(put 'org-cmenu-copy-datum 'org-cmenu '(:target all))
+(put 'org-cmenu-copy-datum 'org-cmenu '(:target (all buffer)))
 (defun org-cmenu-copy-datum (&optional datum)
   (interactive)
   (org-cmenu-mark-datum datum)
@@ -1190,6 +1192,64 @@ org-entities-user)."
 ;;(defun org-cmenu-insert-options ()
 ;;  )
 
+(defun org-cmenu-read-option-keyword ()
+  (completing-read "Keyword: "
+                   (seq-uniq
+                    (append
+                     org-options-keywords
+                     (mapcar (lambda (kw) (concat kw ":"))
+                             (org-get-export-keywords))))))
+
+(defun org-cmenu-insert-option-keyword (option-name
+                                        &optional
+                                        value
+                                        at-top
+                                        no-append)
+  (interactive
+   (list (org-cmenu-read-option-keyword)))
+
+  (cond
+   ((and
+     no-append
+     (progn
+       (goto-char (point-min))
+       (re-search-forward (concat "^[ \t]*#\\+" option-name "[^\n]+") nil t)))
+    nil)
+   (t
+    (when at-top
+      (goto-char (point-min))
+      (when (re-search-forward "^[^#]" nil t)
+        (goto-char (match-beginning 0))))
+    (insert "#+" option-name " " (or value "") "\n")
+    (backward-char)
+    t)))
+
+(defun org-cmenu-insert-option-keyword-at-top ()
+  (interactive)
+  (org-cmenu-insert-option-keyword (org-cmenu-read-option-keyword) nil t))
+
+(defvar org-cmenu-default-title-info
+  ;; see: org-pcomplete.el
+  '(("TITLE:" . (lambda ()
+                  (if-let ((file (buffer-file-name (buffer-base-buffer))))
+                      (file-name-sans-extension (file-name-nondirectory file))
+                    (buffer-name (buffer-base-buffer)))))
+    ("DATE:" . (lambda () (format-time-string (car org-time-stamp-formats))))
+    ;;("EMAIL:" . (lambda () (or user-mail-address "")))
+    ("AUTHOR:" . (lambda () (or user-full-name "")))))
+
+(defun org-cmenu-insert-title-info ()
+  (interactive)
+  (let (first-pos)
+    (dolist (kw-fun org-cmenu-default-title-info)
+      (let* ((kw (car kw-fun))
+             (fun (cdr kw-fun))
+             (inserted-p (org-cmenu-insert-option-keyword kw nil t t)))
+        (unless first-pos
+          (setq first-pos (point)))
+        (when inserted-p
+          (insert (funcall fun)))))
+    (goto-char first-pos)))
 
 
 (provide 'org-cmenu-tools)

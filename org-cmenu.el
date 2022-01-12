@@ -85,6 +85,8 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
   (setf (alist-get alias org-cmenu-type-aliases) type-ids))
 
 (defun org-cmenu-define-standard-type-aliases ()
+  ;; Buffer pseudo element (see: org-cmenu-element-lineage)
+  (org-cmenu-define-type-alias 'buffer '(buffer))
   ;; Each elements (see: org-element-all-elements)
   (dolist (type org-element-all-elements)
     (org-cmenu-define-type-alias type (list type)))
@@ -92,8 +94,10 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
   (dolist (type org-element-all-objects)
     (org-cmenu-define-type-alias type (list type)))
   ;; All elements and all objects (all)
-  (org-cmenu-define-type-alias 'all (append org-element-all-elements
-                                          org-element-all-objects))
+  (org-cmenu-define-type-alias 'all
+                               (append
+                                org-element-all-elements
+                                org-element-all-objects))
   ;; All elements (elements)
   (org-cmenu-define-type-alias 'elements org-element-all-elements)
   ;; All objects (objects)
@@ -107,10 +111,12 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
                               #'eq))
   ;; Elements that can be comment (com-elements)
   (org-cmenu-define-type-alias 'com-elements
-                             (seq-difference
-                              org-element-all-elements
-                              '(item table-row table-cell)
-                              #'eq))
+                               (append
+                                '(buffer)
+                                (seq-difference
+                                 org-element-all-elements
+                                 '(item table-row table-cell)
+                                 #'eq)))
   ;; Elements that have contents (contents)
   (org-cmenu-define-type-alias
    'contents
@@ -432,13 +438,45 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
 
 (defun org-cmenu-element-current-section ()
   (save-excursion
-    (when (outline-previous-heading)
-      (forward-line))
+    ;; Move to next line of heading or point-min.
+    (condition-case nil
+        (progn
+          (org-back-to-heading t)
+          (forward-line))
+      (error
+       (goto-char (point-min))))
+    ;; Return the section element at point.
     (org-element-section-parser nil)))
+
+(defun org-cmenu-element-headlines-path (with-self)
+  "Return a list of elements from current headline to top level headline."
+  (save-excursion
+    (let (path)
+      (when (ignore-errors (org-back-to-heading t))
+        (when with-self
+          (push (org-element-at-point) path))
+        (while (org-up-heading-safe)
+          (push (org-element-at-point) path)))
+      (nreverse path))))
+
+(defun org-cmenu-element-buffer ()
+  "Return a buffer pseudo element."
+  (let ((beg (point-min))
+        (end (point-max)))
+    (list
+     'buffer
+     (list
+      :begin beg
+      :post-affiliated beg
+      :contents-begin beg
+      :contents-end end
+      :post-blank 0
+      :end end))))
 
 (defun org-cmenu-element-lineage ()
   (let ((path (org-element-lineage (org-element-context) nil t))
         (pos (point)))
+    ;; Exclude elements whose POS intersects only post-blank
     (while (and path
                 (pcase (org-element-type (car path))
                   ;; only the first line is recognized as a headline.
@@ -449,12 +487,26 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
                            (car path) pos)))))
       (setq path (cdr path)))
 
-    (if (eq (org-element-type (car path)) 'headline)
-        path
-      ;; add a section element
-      (append
-       path
-       (list (org-cmenu-element-current-section))))))
+    (let ((on-headline-p (eq (org-element-type (car path)) 'headline)))
+      ;; Add a section element
+      (unless on-headline-p
+        (setq path
+              (append
+               path
+               (list (org-cmenu-element-current-section)))))
+
+      ;; Add headline elements
+      (setq path
+            (append
+             path
+             (org-cmenu-element-headlines-path (not on-headline-p))))
+
+      ;; Add buffer elements
+      (setq path
+            (append
+             path
+             (list (org-cmenu-element-buffer)))))
+    path))
 
 ;;;; Menu
 
@@ -485,6 +537,9 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
            do (when (eq (car p) elt)
                 (cl-return (cadr p)))))
 
+(defun org-cmenu-target-root ()
+  (car (last org-cmenu-pointed-path)))
+
 (defun org-cmenu-target-parent ()
   "Return the parent of the current datum."
   (org-cmenu-next-element org-cmenu-target-datum org-cmenu-pointed-path))
@@ -492,6 +547,15 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
 (defun org-cmenu-target-child ()
   "Return the child of the current datum."
   (org-cmenu-next-element org-cmenu-target-datum (reverse org-cmenu-pointed-path)))
+
+(defun org-cmenu-target-leaf ()
+  (car org-cmenu-pointed-path))
+
+(defun org-cmenu-select-root ()
+  (interactive)
+  (if-let ((root (org-cmenu-target-root)))
+      (org-cmenu-open-internal root)
+    (org-cmenu-open-internal org-cmenu-target-datum)))
 
 (defun org-cmenu-select-parent ()
   (interactive)
@@ -505,6 +569,12 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
       (org-cmenu-open-internal child)
     (org-cmenu-open-internal org-cmenu-target-datum)))
 
+(defun org-cmenu-select-leaf ()
+  (interactive)
+  (if-let ((leaf (org-cmenu-target-leaf)))
+      (org-cmenu-open-internal leaf)
+    (org-cmenu-open-internal org-cmenu-target-datum)))
+
 (defun org-cmenu-define-transient-prefix-for-type (type-id)
   (let ((type (org-cmenu-get-type type-id))
         (prefix-name (intern
@@ -516,9 +586,11 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
         ,(format "Operations for %s" type-id)
         [:description
          org-cmenu-on-setup ;;HACK!! I want to callback when returned from subprefix!
-         [("q" "Quit" transient-quit-one)]
+         [("~" "Root" org-cmenu-select-root :if org-cmenu-target-parent)]
          [("^" "Parent" org-cmenu-select-parent :if org-cmenu-target-parent)]
          [("\\" "Child" org-cmenu-select-child :if org-cmenu-target-child)]
+         [("|" "Leaf" org-cmenu-select-leaf :if org-cmenu-target-child)]
+         [("q" "Quit" transient-quit-one)]
          ]
         ;; Groups
         ,@(cl-loop for group in (org-cmenu-type-groups type)
@@ -662,14 +734,11 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
 
 ;; Beginning of Menu
 
-(defun org-cmenu (&optional datum)
-  "Open a menu for the syntax element pointed by the current point or DATUM."
+(defun org-cmenu ()
+  "Open a menu for the syntax element pointed by the current point."
   (interactive)
 
-  (let* ((path
-          (if datum
-              (org-element-lineage datum nil t)
-            (org-cmenu-element-lineage)))
+  (let* ((path (org-cmenu-element-lineage))
          (datum (car path)))
     (unless datum
       (error "No elements"))

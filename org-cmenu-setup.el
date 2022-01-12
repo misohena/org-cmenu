@@ -631,7 +631,8 @@
     ("a" "#+CALL" org-cmenu-insert-babel-call)
     ("M" "#+MACRO" org-cmenu-insert-macro-definition)
     (":" "Fixed Width" org-cmenu-insert-fixed-width)
-    ("-" "Horizontal" org-cmenu-insert-horizontal-rule)]
+    ("-" "Horizontal" org-cmenu-insert-horizontal-rule)
+    ("o" "Option" org-cmenu-insert-option-keyword)]
    ])
 
 (org-cmenu-add-commands
@@ -645,6 +646,16 @@
 ;;@todo Add commands to decorate region. bold, italic, etc.
 
 ;;@todo Add commands to convert region to block.
+
+;;;; Buffer
+
+(org-cmenu-add-commands
+ '(:buffer "Insert")
+ '(("i+" "#+" org-cmenu-insert-option-keyword-at-top)
+   ("it" "#+TITLE:" org-cmenu-insert-title-info))
+ '(buffer)
+ 'no-wrap)
+
 
 (provide 'org-cmenu-setup)
 ;;; org-cmenu-setup.el ends here
