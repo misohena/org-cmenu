@@ -157,11 +157,12 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
   (or (org-cmenu-get-type type-id)
       (org-cmenu-add-type type-id)))
 
-(defun org-cmenu-add-command-to-types (group-path command target-types)
+(defun org-cmenu-add-command-to-types (group-path command target-types
+                                                  &optional remove-duplicates-p)
   (dolist (type-id target-types)
     (org-cmenu-type-add-command
      (org-cmenu-get-type-create type-id)
-     group-path command)))
+     group-path command remove-duplicates-p)))
 
 ;;;; Syntax Element Type
 
@@ -226,10 +227,11 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
 
     group))
 
-(defun org-cmenu-type-add-command (type group-path command)
+(defun org-cmenu-type-add-command (type group-path command remove-duplicates-p)
   (org-cmenu-group-add-command
    (org-cmenu-type-get-group-create type group-path)
-   command))
+   command
+   remove-duplicates-p))
 
 (defun org-cmenu-type-remove-command (type group-path key)
   (when-let ((group (org-cmenu-type-get-group type group-path)))
@@ -283,15 +285,17 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
                  (list subgroup)))
     subgroup))
 
-(defun org-cmenu-group-add-command (group command)
+(defun org-cmenu-group-add-command (group command &optional remove-duplicates-p)
   (setf (org-cmenu-group-elements group)
         (nconc
-         ;; Remove commands with duplicate keys from GROUP
-         (seq-remove (lambda (elm)
-                       (org-cmenu-command-equal-key
-                        elm
-                        (org-cmenu-command-get-key command)))
-                     (org-cmenu-group-elements group))
+         (if remove-duplicates-p
+             ;; Remove commands with duplicate keys from GROUP
+             (seq-remove (lambda (elm)
+                           (org-cmenu-command-equal-key
+                            elm
+                            (org-cmenu-command-get-key command)))
+                         (org-cmenu-group-elements group))
+           (org-cmenu-group-elements group))
          ;; Add COMMAND to the end
          (cons command nil)))
   command)
@@ -853,7 +857,8 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
     (cons target-types target-props)))
 
 (defun org-cmenu-add-command (group-path command &optional
-                                         target-spec wrapping-method)
+                                         target-spec wrapping-method
+                                         remove-duplicates-p)
   (let* ((command (copy-sequence command))
          (func (org-cmenu-command-function command))
          (func-props (and (symbolp func) (get func 'org-cmenu)))
@@ -888,12 +893,14 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
              (list :if (lambda () (funcall pred org-cmenu-target-datum)))
              (org-cmenu-command-properties command))))
 
-    (org-cmenu-add-command-to-types group-path command target-types)))
+    (org-cmenu-add-command-to-types group-path command target-types remove-duplicates-p)))
 
 (defun org-cmenu-add-commands (group-path commands &optional
-                                          target-spec wrapping-method)
+                                          target-spec wrapping-method
+                                          remove-duplicates-p)
   (dolist (command commands)
-    (org-cmenu-add-command group-path command target-spec wrapping-method)))
+    (org-cmenu-add-command group-path command target-spec wrapping-method
+                           remove-duplicates-p)))
 
 (defun org-cmenu-apply-target-types (target-spec func)
   (let* ((target (org-cmenu-resolve-target-spec target-spec))
