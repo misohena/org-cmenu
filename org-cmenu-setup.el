@@ -54,7 +54,8 @@
  '(("m" "Mark" org-cmenu-mark-datum)
    ("C-w" "Kill" org-cmenu-kill-datum)
    ("M-w" "Copy" org-cmenu-copy-datum)
-   ("N" "Narrow/Widen" org-cmenu-toggle-narrow-datum)
+   ("N" "Narrow" org-cmenu-narrow-to-datum)
+   ("N" "Widen" org-cmenu-widen-buffer)
    ("?" "Manual" org-cmenu-browse-type-document)
    (";" "Comment" org-cmenu-comment-element)))
 

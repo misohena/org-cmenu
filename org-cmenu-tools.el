@@ -44,18 +44,18 @@
    ;;'(link paragraph item plain-list).
    (org-element-lineage (or element (org-element-context)) nil t)))
 
-(defun org-cmenu-narrow-to-datum (datum)
-  (interactive (list (org-element-context)))
-  (narrow-to-region
-   (org-element-property :begin datum)
-   (org-element-property :end datum)))
-
 (defun org-cmenu-under-section-p (datum)
   (member
    (org-element-type (org-element-property :parent datum))
    '(nil section)))
 
 ;;;; Predicates
+
+(defun org-cmenu-buffer-narrowed-p (&rest _)
+  (buffer-narrowed-p))
+
+(defun org-cmenu-buffer-not-narrowed-p (&rest _)
+  (not (buffer-narrowed-p)))
 
 (defun org-cmenu-element-p (datum)
   "Return t if DATUM is a element (not an inline object)."
@@ -331,6 +331,20 @@
   (if (buffer-narrowed-p)
       (widen)
     (org-cmenu-narrow-to-datum datum)))
+
+(put 'org-cmenu-narrow-to-datum 'org-cmenu
+     '(:target (all :pred org-cmenu-buffer-not-narrowed-p)))
+(defun org-cmenu-narrow-to-datum (datum)
+  (interactive (list (org-element-context)))
+  (narrow-to-region
+   (org-element-property :begin datum)
+   (org-element-property :end datum)))
+
+(put 'org-cmenu-widen-buffer 'org-cmenu
+     '(:target (all buffer :pred org-cmenu-buffer-narrowed-p) :call no-wrap))
+(defun org-cmenu-widen-buffer ()
+  (interactive)
+  (widen))
 
 ;;;;; Contents
 
