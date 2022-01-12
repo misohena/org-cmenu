@@ -132,10 +132,10 @@
       (error "Unknown type %s" type))))
 
 (defun org-cmenu-current-affiliated-keyword-at-point (&optional datum pos)
-  (let ((datum (or datum (org-element-at-point)))
-        (datum-beg (org-element-property :begin datum))
-        (datum-post-aff (org-element-property :post-affiliated datum))
-        (pos (or pos (point))))
+  (let* ((datum (or datum (org-element-at-point)))
+         (datum-beg (org-element-property :begin datum))
+         (datum-post-aff (org-element-property :post-affiliated datum))
+         (pos (or pos (point))))
     (when (and datum-beg
                datum-post-aff
                (<= datum-beg pos)
