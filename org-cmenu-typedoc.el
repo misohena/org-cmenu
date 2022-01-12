@@ -50,7 +50,18 @@
     (horizontal-rule . "https://orgmode.org/manual/Horizontal-Rules.html")
     (inlinetask . "https://git.savannah.gnu.org/cgit/emacs/org-mode.git/tree/lisp/org-inlinetask.el")
     (item . "https://orgmode.org/manual/Plain-Lists.html")
-    (keyword . "https://orgmode.org/manual/In_002dbuffer-Settings.html")
+    (keyword
+     . (lambda (datum)
+         (pcase (org-element-property :key datum)
+           ((or "ARCHIVE" "CATEGORY" "COLUMNS" "CONSTANTS" "FILETAGS" "LINK"
+                "PRIORITIES" "PROPERTY" "SETUPFILE" "STARTUP"
+                "TAGS" "TODO" "SEQ_TODO" "TYP_TODO")
+            "https://orgmode.org/manual/In_002dbuffer-Settings.html")
+           ((pred (lambda (kw) (string-prefix-p "HTML" kw)))
+            "https://orgmode.org/manual/HTML-specific-export-settings.html")
+           ("INFOJS_OPT"
+            "https://orgmode.org/manual/JavaScript-support.html")
+           (_ "https://orgmode.org/manual/Export-Settings.html"))))
     (latex-environment . "https://orgmode.org/manual/LaTeX-fragments.html")
     (node-property . "https://orgmode.org/manual/Property-Syntax.html")
     (paragraph . "https://orgmode.org/manual/Paragraphs.html")
@@ -90,19 +101,50 @@
     (underline . "https://orgmode.org/manual/Emphasis-and-Monospace.html")
     (verbatim . "https://orgmode.org/manual/Emphasis-and-Monospace.html")))
 
+(defconst org-cmenu-affiliated-keyword-document-alist
+  '(("CAPTION" . "https://orgmode.org/manual/Captions.html")))
+
 (put 'org-cmenu-browse-type-document 'org-cmenu
      '(:target all))
-(defun org-cmenu-browse-type-document (type)
+(defun org-cmenu-browse-type-document (type-or-datum)
   (interactive
    (list
     (intern (completing-read "Type: " org-cmenu-type-document-alist))))
 
-  (when (listp type)
-    (setq type (org-element-type type)))
+  (let* ((datum (if (listp type-or-datum) type-or-datum))
+         (type (if datum (org-element-type datum) type-or-datum))
+         (url-or-fun
+          (or
+           ;; From Affiliated Keyword
+           (when-let ((aff-kw (org-cmenu-current-affiliated-keyword-at-point datum)))
+             (alist-get
+              aff-kw
+              org-cmenu-affiliated-keyword-document-alist
+              nil nil #'string=))
+           ;; From Type
+           (alist-get type org-cmenu-type-document-alist))))
+    ;; Open Browser
+    (if url-or-fun
+        (browse-url
+         (if (functionp url-or-fun)
+             (funcall url-or-fun datum)
+           url-or-fun))
+      (error "Unknown type %s" type))))
 
-  (if-let ((url (alist-get type org-cmenu-type-document-alist)))
-      (browse-url url)
-    (error "Unknown type %s" type)))
+(defun org-cmenu-current-affiliated-keyword-at-point (&optional datum pos)
+  (let ((datum (or datum (org-element-at-point)))
+        (datum-beg (org-element-property :begin datum))
+        (datum-post-aff (org-element-property :post-affiliated datum))
+        (pos (or pos (point))))
+    (when (and datum-beg
+               datum-post-aff
+               (<= datum-beg pos)
+               (< pos datum-post-aff))
+      (save-excursion
+        (forward-line 0)
+        (when (looking-at
+               "[ \t]*#\\+\\([a-zA-Z_-]+\\)")
+          (upcase (match-string-no-properties 1)))))))
 
 (provide 'org-cmenu-typedoc)
 ;;; org-cmenu-typedoc.el ends here
