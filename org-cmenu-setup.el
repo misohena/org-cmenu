@@ -488,12 +488,20 @@
    ("C-a" "First Column" org-cmenu-table-first-column-in-row :transient t)
    ("C-e" "Last Column" org-cmenu-table-last-column-in-row :transient t)
    ("M-<" "First Field" org-cmenu-table-first-field-in-table :transient t)
-   ("M->" "Last Field" org-cmenu-table-last-field-in-table :transient t))
+   ("M->" "Last Field" org-cmenu-table-last-field-in-table :transient t)
+   ("C-v" "Scroll Up" org-cmenu-table-scroll-up :transient t)
+   ("M-v" "Scroll Down" org-cmenu-table-scroll-down :transient t))
  '(table-cell)
  'no-wrap)
 
 (org-cmenu-add-string '(table-cell) '(:basic "Navigation")
-                      "C-b,f,p,n,a,e M-<,>")
+                      "C-b,f,p,n")
+(org-cmenu-add-string '(table-cell) '(:basic "Navigation")
+                      "C-a,e")
+(org-cmenu-add-string '(table-cell) '(:basic "Navigation")
+                      "M-<,>")
+(org-cmenu-add-string '(table-cell) '(:basic "Navigation")
+                      "C-v,M-v")
 
 ;;;; Object
 ;;;;; bold, underline, italic, verbatim, code, strike-through

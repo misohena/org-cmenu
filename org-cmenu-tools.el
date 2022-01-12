@@ -914,6 +914,46 @@ Return t when the line exists, nil if it does not exist."
              (org-cmenu-table-goto-last-non-empty-row-bol))
     (org-cmenu-table-last-column-in-row)))
 
+;;;;; Scroll
+
+(defun org-cmenu-table-scroll-up (&optional arg)
+  (interactive "^P")
+  (when (org-at-table-p)
+    (let* ((table-end (org-table-end))
+           (start-line-pos (line-beginning-position))
+           (start-window-start (window-start))
+           (start-window-end (window-end))
+           (start-col (org-table-current-column)))
+      (scroll-up-command arg)
+      (when (> (point) table-end)
+        (goto-char table-end))
+      (while (and
+              (> (line-beginning-position) start-line-pos)
+              (not (org-cmenu-table-has-column-p start-col)))
+        (forward-line -1))
+      (org-cmenu-table-goto-column start-col)
+      (when (< (point) (window-start))
+        (set-window-start (selected-window) start-window-start)))))
+
+(defun org-cmenu-table-scroll-down (&optional arg)
+  (interactive "^P")
+  (when (org-at-table-p)
+    (let* ((table-begin (org-table-begin))
+           (start-line-pos (line-beginning-position))
+           (start-window-start (window-start))
+           (start-window-end (window-end))
+           (start-col (org-table-current-column)))
+      (scroll-down-command arg)
+      (when (< (point) table-begin)
+        (goto-char table-begin))
+      (while (and
+              (< (line-beginning-position) start-line-pos)
+              (not (org-cmenu-table-has-column-p start-col)))
+        (forward-line 1))
+      (org-cmenu-table-goto-column start-col)
+      (when (>= (point) start-window-start)
+        (set-window-start (selected-window) start-window-start)))))
+
 ;;;;; Mark
 
 (put 'org-cmenu-table-mark-all 'org-cmenu
