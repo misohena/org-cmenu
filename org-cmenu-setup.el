@@ -447,7 +447,7 @@
    ("h" "Info" org-table-field-info :transient t)
    ("=" "Set Formula" (lambda () (interactive) (org-table-eval-formula '(4))) :transient t)
    (":" "Edit Formula" (lambda () (interactive) (org-table-eval-formula '(16))) :transient t)
-   ("`" "Edit Field" org-table-edit-field)
+   ("e" "Edit Field" org-table-edit-field)
    ;;@todo insert org-recalc-marks
    )
  '(table-cell)
