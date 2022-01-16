@@ -66,21 +66,29 @@
   (and (eq (org-element-type datum) 'link)
         (if-let ((parent (org-element-property :parent datum)))
             (equal
-             (+ (org-element-property :begin parent)
-                (org-element-property
-                 :begin
-                 (seq-find
-                  (lambda (e) (eq (org-element-type e) 'link))
-                  (org-element-parse-secondary-string
-                   (save-excursion
-                     (save-restriction
-                       (widen)
-                       (buffer-substring
-                        (org-element-property :begin parent)
-                        (org-element-property :end parent))))
-                   '(link)
-                   (org-element-property :parent parent))))
-                -1)
+             ;; Do not use org-element-parse-secondary-string.
+             ;; Causes strange behavior in org2blog buffer.
+             ;; (+ (org-element-property :begin parent)
+             ;;    (org-element-parse-secondary-string
+             ;;     (save-excursion
+             ;;       (save-restriction
+             ;;         (widen)
+             ;;         (buffer-substring
+             ;;          (org-element-property :begin parent)
+             ;;          (org-element-property :end parent))))
+             ;;     '(link)
+             ;;     (org-element-property :parent parent))
+             ;;    -1)
+             (org-element-property
+              :begin
+              (seq-find
+               (lambda (e) (eq (org-element-type e) 'link))
+               (org-element--parse-objects
+                (org-element-property :begin parent)
+                (org-element-property :end parent)
+                nil
+                '(link)
+                parent)))
              (org-element-property :begin datum))
           t)))
 
