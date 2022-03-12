@@ -339,7 +339,7 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
    (pcase p
      ;; :hide boolean => :hide (lambda () boolean)
      (`(:hide ,(and (pred booleanp) value) . ,_)
-      (list :hide (lambda () value)))
+      (list :hide `(lambda () ,value)))
      ;; key value
      (`(,key ,value . ,_)
       (list key value)))))
@@ -890,7 +890,7 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
     (when-let ((pred (plist-get target-props :pred)))
       (setf (org-cmenu-command-properties command)
             (nconc
-             (list :if (lambda () (funcall pred org-cmenu-target-datum)))
+             (list :if `(lambda () (funcall (quote ,pred) org-cmenu-target-datum)))
              (org-cmenu-command-properties command))))
 
     (org-cmenu-add-command-to-types group-path command target-types remove-duplicates-p)))
