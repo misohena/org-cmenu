@@ -28,6 +28,8 @@
 
 ;;; Code:
 
+(require 'org-element)
+
 ;; ref:
 ;; - https://orgmode.org/org.html
 ;; - https://orgmode.org/manual/Main-Index.html

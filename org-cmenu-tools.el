@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'org)
+(require 'org-element)
 
 ;;;; Common
 
@@ -542,7 +543,8 @@
       (setq path (expand-file-name path))
       (find-file (file-name-directory path))
       (when (eq major-mode 'dired-mode)
-        (dired-goto-file path)))))
+        (with-no-warnings
+          (dired-goto-file path))))))
 
 (put 'org-cmenu-link-copy-path 'org-cmenu '(:target link))
 (defun org-cmenu-link-copy-path (link)
@@ -685,7 +687,7 @@
 
 (put 'org-cmenu-plain-list-make-subtree 'org-cmenu
      '(:target (plain-list :pred org-cmenu-under-section-p)))
-(defun org-cmenu-plain-list-make-subtree (datum)
+(defun org-cmenu-plain-list-make-subtree (_datum)
   (save-excursion
     (save-restriction
       (org-list-make-subtree))))
@@ -930,7 +932,7 @@ Return t when the line exists, nil if it does not exist."
     (let* ((table-end (org-table-end))
            (start-line-pos (line-beginning-position))
            (start-window-start (window-start))
-           (start-window-end (window-end))
+           ;;(start-window-end (window-end))
            (start-col (org-table-current-column)))
       (scroll-up-command arg)
       (when (> (point) table-end)
@@ -949,7 +951,7 @@ Return t when the line exists, nil if it does not exist."
     (let* ((table-begin (org-table-begin))
            (start-line-pos (line-beginning-position))
            (start-window-start (window-start))
-           (start-window-end (window-end))
+           ;;(start-window-end (window-end))
            (start-col (org-table-current-column)))
       (scroll-down-command arg)
       (when (< (point) table-begin)
