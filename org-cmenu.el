@@ -86,7 +86,7 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
 
 (defun org-cmenu-define-standard-type-aliases ()
   ;; Buffer pseudo element (see: org-cmenu-element-lineage)
-  (org-cmenu-define-type-alias 'buffer '(buffer))
+  (org-cmenu-define-type-alias 'buffer '(buffer org-data))
   ;; Each elements (see: org-element-all-elements)
   (dolist (type org-element-all-elements)
     (org-cmenu-define-type-alias type (list type)))
@@ -491,25 +491,26 @@ If nil you should use `org-cmenu-update-transient-prefixes' function."
                            (car path) pos)))))
       (setq path (cdr path)))
 
-    (let ((on-headline-p (eq (org-element-type (car path)) 'headline)))
-      ;; Add a section element
-      (unless on-headline-p
+    (unless (eq (org-element-type (car (last path))) 'org-data)
+      (let ((on-headline-p (eq (org-element-type (car path)) 'headline)))
+        ;; Add a section element
+        (unless on-headline-p
+          (setq path
+                (append
+                 path
+                 (list (org-cmenu-element-current-section)))))
+
+        ;; Add headline elements
         (setq path
               (append
                path
-               (list (org-cmenu-element-current-section)))))
+               (org-cmenu-element-headlines-path (not on-headline-p))))
 
-      ;; Add headline elements
-      (setq path
-            (append
-             path
-             (org-cmenu-element-headlines-path (not on-headline-p))))
-
-      ;; Add buffer elements
-      (setq path
-            (append
-             path
-             (list (org-cmenu-element-buffer)))))
+        ;; Add buffer elements
+        (setq path
+              (append
+               path
+               (list (org-cmenu-element-buffer))))))
     path))
 
 ;;;; Menu
