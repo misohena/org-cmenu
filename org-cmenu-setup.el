@@ -640,6 +640,7 @@
     ("a" "#+CALL" org-cmenu-insert-babel-call)
     ("M" "#+MACRO" org-cmenu-insert-macro-definition)
     (":" "Fixed Width" org-cmenu-insert-fixed-width)
+    ("x" "Dynamic Block" org-dynamic-block-insert-dblock)
     ("-" "Horizontal" org-cmenu-insert-horizontal-rule)
     ("o" "Option" org-cmenu-insert-option-keyword)]
    ])
