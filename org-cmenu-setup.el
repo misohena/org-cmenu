@@ -553,7 +553,8 @@
    ("o" "Open" org-cmenu-link-open-by-default)
    ("x" "Open by system" org-cmenu-link-open-by-system)
    ("i" "Open by emacs" org-cmenu-link-open-by-emacs)
-   ("cp" "Copy Path" org-cmenu-link-copy-path))
+   ("cp" "Copy Path" org-cmenu-link-copy-path)
+   ("TAB" "Toggle Link Display" org-toggle-link-display))
  '(link)
  'no-wrap)
 
